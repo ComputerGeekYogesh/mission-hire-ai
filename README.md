@@ -284,19 +284,6 @@ Legacy telephony variables (`TWILIO_*`, `DEEPGRAM_*`, `BREVO_*`) are **not used*
 
 ---
 
-## Screenshots
-
-_Add screenshots here after deployment—for example: login page, schedule chat, candidate room, session detail with recording & Mission verdict._
-
-Suggested captures:
-
-1. **Login** — `views/login.ejs`
-2. **Schedule chat** — `/admin/interviews/schedule`
-3. **Session detail** — Recording + Summary tabs
-4. **Candidate preflight** — Device check screen
-
----
-
 ## Troubleshooting
 
 | Issue | What to check |
