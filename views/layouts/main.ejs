@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/mission-favicon.svg?v=1" />
+  <link rel="apple-touch-icon" href="/mission-favicon.svg?v=1" />
+  <title><%= title %> | Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f5f5f5;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: #ffffff;
+      padding: 1.5rem;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #333;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    .sidebar a:hover {
+      background: #f0f0f0;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 2rem;
+      flex-grow: 1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      color: #333;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-card {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <% include ../partials/sidebar %>
+
+  <div class="main-content">
+    <% include ../partials/header %>
+
+    <%- body %>
+  </div>
+
+</body>
+</html>

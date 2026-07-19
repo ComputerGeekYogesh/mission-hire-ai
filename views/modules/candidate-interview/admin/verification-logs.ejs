@@ -1,0 +1,36 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Candidate Verification Logs</h1>
+      <p class="im-page-sub">OTP, preflight, and identity verification events.</p>
+    </header>
+    <%- include('_nav') %>
+    <div class="im-table-card table-responsive">
+      <table class="table mb-0">
+        <thead><tr><th>Time</th><th>Candidate</th><th>Event</th><th>Success</th><th>IP</th></tr></thead>
+        <tbody>
+        <% logs.forEach(function(l) { %>
+          <tr>
+            <td><%= moment(l.created_at).format('MMM D HH:mm:ss') %></td>
+            <td><%= l.candidate_name %></td>
+            <td><%= l.event_type %></td>
+            <td><%= l.success ? 'Yes' : 'No' %></td>
+            <td><%= l.ip_address || '-' %></td>
+          </tr>
+        <% }) %>
+        <% if (!logs.length) { %>
+          <tr><td colspan="5" class="im-empty">No verification logs yet.</td></tr>
+        <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

@@ -1,0 +1,423 @@
+<%- include('partials/header') %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #14121B;
+    --bg-deep: #0E0C14;
+    --surface: #1E1B29;
+    --surface-2: #26222F;
+    --border: #332E42;
+    --border-soft: #26222F;
+    --gold: #D4A24E;
+    --gold-dim: #8C6E38;
+    --periwinkle: #7C90F0;
+    --periwinkle-dim: #4C5390;
+    --ink: #F3EFE7;
+    --ink-muted: #A69FB3;
+    --ink-faint: #736C82;
+  }
+
+  body.bg-gray-200,
+  body {
+    margin: 0 !important;
+    background: var(--bg-deep) !important;
+    font-family: 'Inter', sans-serif !important;
+    color: var(--ink) !important;
+    overflow-x: hidden;
+  }
+
+  .container.position-sticky { display: none; }
+
+  .mh-login-page {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 82% 20%, rgba(124,144,240,0.10), transparent 45%),
+      radial-gradient(circle at 8% 80%, rgba(212,162,78,0.08), transparent 40%),
+      var(--bg);
+    display: flex;
+    align-items: center;
+  }
+
+  #mh-bg-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: .55;
+  }
+
+  .mh-login-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 48px 90px;
+    gap: 48px;
+  }
+
+  .mh-login-copy {
+    max-width: 620px;
+    flex: 1;
+  }
+
+  .mh-login-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .14em;
+    color: var(--periwinkle);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .mh-login-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--periwinkle);
+    box-shadow: 0 0 0 3px rgba(124,144,240,.18);
+  }
+
+  .mh-login-copy h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 44px;
+    line-height: 1.18;
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .mh-login-copy h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .mh-login-side {
+    width: 420px;
+    flex-shrink: 0;
+  }
+
+  .mh-login-card {
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .mh-login-card-head {
+    padding: 26px 28px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(124,144,240,.14), rgba(212,162,78,.08));
+    border-bottom: 1px solid var(--border);
+  }
+
+  .mh-login-card-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 22px;
+    margin: 0 0 10px;
+    color: var(--ink);
+  }
+
+  .mh-login-card-head p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+
+  .mh-login-card-head strong {
+    color: var(--ink);
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .mh-login-card-body {
+    padding: 28px;
+  }
+
+  .mh-login-card label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+
+  .mh-login-card input {
+    width: 100%;
+    background: var(--bg-deep);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 14px;
+    color: var(--ink);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    letter-spacing: .28em;
+    text-align: center;
+    margin-bottom: 22px;
+    outline: none;
+    transition: border-color .2s ease;
+  }
+
+  .mh-login-card input::placeholder {
+    color: var(--ink-faint);
+    letter-spacing: .08em;
+    font-size: 13px;
+  }
+
+  .mh-login-card input:focus {
+    border-color: var(--periwinkle-dim);
+  }
+
+  .mh-btn-primary {
+    width: 100%;
+    background: var(--gold);
+    color: #241B08;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    letter-spacing: .03em;
+    padding: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+
+  .mh-btn-primary:hover {
+    opacity: .92;
+    transform: translateY(-1px);
+  }
+
+  .mh-btn-secondary {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: var(--ink-muted);
+    border: 1px solid var(--border);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    padding: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: border-color .2s ease, background .2s ease, color .2s ease;
+  }
+
+  .mh-btn-secondary:hover {
+    border-color: var(--periwinkle-dim);
+    background: rgba(124,144,240,.06);
+    color: var(--ink);
+  }
+
+  .mh-alert {
+    margin-top: 16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    border: 1px solid var(--border);
+  }
+
+  .mh-alert-success {
+    background: rgba(212,162,78,.1);
+    border-color: var(--gold-dim);
+    color: var(--ink);
+  }
+
+  .mh-alert-error {
+    background: rgba(124,144,240,.08);
+    border-color: var(--periwinkle-dim);
+    color: var(--ink);
+  }
+
+  @media (max-width: 992px) {
+    .mh-login-content {
+      flex-direction: column;
+      justify-content: center;
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .mh-login-copy {
+      max-width: 100%;
+    }
+
+    .mh-login-eyebrow {
+      justify-content: center;
+    }
+
+    .mh-login-side {
+      width: 100%;
+      max-width: 420px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .mh-login-copy h1 {
+      font-size: 32px;
+    }
+
+    .mh-login-content {
+      padding: 32px 24px;
+    }
+  }
+</style>
+
+<main class="mh-login-page">
+  <canvas id="mh-bg-canvas" aria-hidden="true"></canvas>
+
+  <div class="mh-login-content">
+    <div class="mh-login-copy">
+      <div class="mh-login-eyebrow">Mission Hire · Account verification</div>
+      <h1>Almost there — enter the OTP to <em>continue.</em></h1>
+    </div>
+
+    <div class="mh-login-side">
+      <div class="mh-login-card">
+        <div class="mh-login-card-head">
+          <h2>Verify OTP</h2>
+          <% if (typeof judgeDemoLogin !== 'undefined' && judgeDemoLogin) { %>
+          <p>Demo access — enter the prefilled OTP below.</p>
+          <% } else { %>
+          <p>Enter the OTP sent to<br><strong><%= email %></strong></p>
+          <% } %>
+        </div>
+        <div class="mh-login-card-body">
+          <form role="form" action="/verify-otp" method="POST">
+            <input type="hidden" name="email" value="<%= email %>" />
+
+            <label for="otp">One-time password</label>
+            <input
+              type="text"
+              id="otp"
+              name="otp"
+              placeholder="Enter OTP"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              value="<%= typeof judgeDemoLogin !== 'undefined' && judgeDemoLogin && demoOtp ? demoOtp : '' %>"
+              required
+            >
+
+            <button type="submit" class="mh-btn-primary">Verify</button>
+          </form>
+          <a href="/login" class="mh-btn-secondary">Back to login</a>
+
+          <% if (typeof success_msg !== 'undefined' && success_msg && success_msg.length > 0) { %>
+            <div class="mh-alert mh-alert-success"><%= success_msg %></div>
+          <% } %>
+          <% if (typeof error_msg !== 'undefined' && error_msg && error_msg.length > 0) { %>
+            <div class="mh-alert mh-alert-error"><%= error_msg %></div>
+          <% } %>
+          <% if (typeof error !== 'undefined' && error && error.length > 0) { %>
+            <div class="mh-alert mh-alert-error"><%= error %></div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('partials/footer') %>
+
+<script>
+  // Animated network background
+  (function() {
+    const canvas = document.getElementById('mh-bg-canvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+    const PARTICLE_COUNT = 70;
+    const LINK_DISTANCE = 150;
+    const particles = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+        this.r = 1.4 + Math.random() * 1.6;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(124, 144, 240, 0.85)';
+        ctx.fill();
+      }
+    }
+
+    resize();
+    window.addEventListener('resize', () => {
+      resize();
+      particles.length = 0;
+      for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+    });
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < LINK_DISTANCE) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(76, 83, 144, ' + ((1 - dist / LINK_DISTANCE) * 0.45) + ')';
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    animate();
+  })();
+</script>

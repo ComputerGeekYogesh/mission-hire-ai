@@ -1,0 +1,91 @@
+<%- include('includes/header') %>
+<body class="g-sidenav-show  bg-gray-100">
+    <%- include('includes/sidebar') %>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <%- include('includes/navbar') %>
+    <!-- End Navbar -->
+     <style>
+  .custom-card {
+    border: 2px solid #cce7ff !important; /* force override */
+    border-radius: 12px !important;
+    transition: 0.3s ease-in-out;
+    background: #f3f3f3a3 !important;
+  }
+  .custom-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    transform: translateY(-3px);
+  }
+
+  .job-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000205;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  white-space: nowrap;       /* Prevents text from wrapping */
+  overflow: hidden;          /* Hides overflow text */
+  text-overflow: ellipsis;   /* Shows "..." for long text */
+}
+</style>
+    <div class="container-fluid py-2 min-vh-100">
+      <div class="row">
+            <div class="col-12">
+                <div class="card my-4">
+                     <div class="card-header p-0 position-relative ">
+                        <div class="bg-gradient-info text-center border-radius-lg pt-4 pb-3">
+                            <h5 class="text-white text-capitalize ps-3">LinkedIn Posts</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card min-vh-100">
+                <div class="card-body px-0 pb-2">
+                    <div class="container" style="max-width: 1200px;">
+                        <div class="row">
+                            <% if (posts && posts.length) { %>
+                            <% posts.forEach(post => { %>
+                                <div class="col-md-3 col-sm-6 mt-3 mb-3">
+                                <a href="/admin/linkedIn-post/<%= post.id %>" class="text-decoration-none text-dark">
+                                    <div class="card h-100 shadow-sm custom-card">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title job-title text-light-emphasis"><%= post.title %></h5>
+                                        <span class="d-block text-muted small">Requisition Id: <%= post.jobNumber %></span>
+                                        <span class="d-block text-muted small">
+                                            Status: 
+                                            <% if (post.status == 1) { %>
+                                                <span class="badge badge-sm bg-gradient-success">Done</span>
+                                            <% } else { %>
+                                                <span class="badge badge-sm bg-gradient-danger">Pending</span>
+                                            <% } %>
+                                        </span>
+                                      
+                                       
+                                    </div>
+                                    </div>
+                                </a>
+                                </div>
+                            <% }) %>
+                            <% } else { %>
+                            <div class="col-12 text-center">
+                                <p class="text-muted">No posts found.</p>
+                            </div>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+    </div>
+      
+      <%- include('includes/sub-footer') %>
+    </div>
+  </main>
+  <%- include('includes/config') %>
+  <!--   Core JS Files   -->
+  <%- include('includes/footer') %>
+

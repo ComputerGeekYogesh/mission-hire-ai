@@ -1,0 +1,218 @@
+<%- include('includes/header') %>
+<body class="g-sidenav-show  bg-gray-100">
+    <%- include('includes/sidebar') %>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <%- include('includes/navbar') %>
+    <!-- End Navbar -->
+     <style>
+  .custom-card {
+    border: 2px solid #cce7ff !important; /* force override */
+    border-radius: 12px !important;
+    transition: 0.3s ease-in-out;
+    background: #f3f3f3a3 !important;
+  }
+  .custom-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    transform: translateY(-3px);
+  }
+
+  .job-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000205;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  white-space: nowrap;       /* Prevents text from wrapping */
+  overflow: hidden;          /* Hides overflow text */
+  text-overflow: ellipsis;   /* Shows "..." for long text */
+}
+
+.outlined-input {
+  border: 2px solid #e4e6e8; /* Blue outline */
+  border-radius: 6px;        /* Optional: Rounded corners */
+  outline: none;             /* Removes default browser outline */
+}
+
+</style>
+    <div class="container-fluid py-2 min-vh-100">
+      <div class="row">
+            <div class="col-12">
+                <div class="card">
+                     <div class="card-header p-0 position-relative ">
+                        <div class=" border-radius-lg pt-4 pb-2 d-flex justify-content-between align-items-center">
+                            <h6 class="text-dark text-capitalize ps-3 pb-0 mb-0">Edit Account</h6>
+                            <a href="/admin/companies" class="btn btn-info ps-3 btn-sm me-4 ">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="row"> -->
+          <div class="col-12 mt-4">
+            <div class="card shadow-lg border-0 rounded-3">
+              <!-- <div class="bg-gradient-info border-radius-lg pt-4 pb-2 d-flex justify-content-between align-items-center">
+                  <h6 class="text-white text-capitalize ps-3">Edit company</h6>
+                  <a href="/admin/companies" class="btn btn-primary btn-sm me-5">Back</a>
+              </div> -->
+
+              <div class="container mt-5 mb-5">
+  <!-- <div class="card shadow-sm border-0 rounded-4"> -->
+    <div class="card-body p-5">
+      
+
+      <form method="POST" action="/admin/company-edit/<%= company.id %>" class="px-md-4">
+        <!-- Company Name -->
+        <div class="row mb-4 align-items-center">
+          <div class="col-md-3">
+            <label for="name" class="form-label mb-0 fw-semibold">Account Name</label>
+          </div>
+          <div class="col-md-9">
+            <input 
+              type="text" 
+              name="name" 
+              id="name"
+              value="<%= company.name %>" 
+              class="form-control form-control-sm outlined-input rounded-3 py-2" 
+              placeholder="Enter Account name" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Company Username -->
+        <div class="row mb-4 align-items-center">
+          <div class="col-md-3">
+            <label for="userName" class="form-label mb-0 fw-semibold">Account Username</label>
+          </div>
+          <div class="col-md-9">
+            <input 
+              type="text" 
+              name="userName" 
+              id="userName"
+              value="<%= company.userName %>"  
+              class="form-control form-control-sm rounded-3 outlined-input py-2" 
+              placeholder="Enter Account user name" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="row mb-4 align-items-center">
+          <div class="col-md-3">
+            <label for="email" class="form-label mb-0 fw-semibold">Email</label>
+          </div>
+          <div class="col-md-9">
+            <input 
+              type="email" 
+              name="email" 
+              id="email"
+              value="<%= company.email %>" 
+              class="form-control form-control-sm rounded-3 outlined-input py-2" 
+              placeholder="Enter email" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Phone -->
+        <div class="row mb-4 align-items-center">
+          <div class="col-md-3">
+            <label for="phone" class="form-label mb-0 fw-semibold">Phone Number</label>
+          </div>
+          <div class="col-md-9">
+            <input 
+              type="tel" 
+              name="phone" 
+              id="phone"
+              value="<%= company.phone %>"  
+              class="form-control form-control-sm rounded-3 outlined-input py-2" 
+              placeholder="Enter phone number" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Role Selection -->
+        <!-- <div class="row mb-4 align-items-center">
+          <div class="col-md-3">
+            <label for="role" class="form-label mb-0 fw-semibold">Select a Role</label>
+          </div>
+          <div class="col-md-9">
+            <select 
+              name="role_id" 
+              id="role" 
+              class="form-control form-control-sm rounded-3 outlined-input py-2" 
+              required
+              >
+              <option value="" disabled selected>Select a role</option>
+              <% roles.forEach(role => { %>
+                <option value="<%= role.id %>" <%= role.id === company.role_id ? 'selected' : '' %>><%= role.name %></option>
+              <% }) %>
+            </select>
+          </div>
+        </div> -->
+
+        <!-- Submit -->
+        <div class="row mb-2">
+          <div class="col-12 d-flex justify-content-center">
+            <button type="submit" class="btn btn-info btn-lg rounded-3 shadow-sm px-5">
+              Update
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  <!-- </div> -->
+</div>
+              <!-- <div class="card-body px-4 py-4">
+                <div class="row justify-content-center">
+                  <div class="col-md-8">
+                    <form role="form" method="POST" action="/admin/company-edit/<%= company.id %>">
+                      <div class="mb-4">
+                        <input 
+                          type="text" 
+                          name="name" 
+                          id="name" 
+                          value="<%= company.name %>"
+                          class="form-control form-control-lg rounded-3 shadow-sm" 
+                          placeholder="Enter name" 
+                          required
+                        ><br>
+                        <input 
+                          type="text" 
+                          name="email" 
+                          id="email" 
+                          value="<%= company.email %>"
+                          class="form-control form-control-lg rounded-3 shadow-sm" 
+                          placeholder="Enter email" 
+                          required
+                        ><br>
+                      </div>
+                      <div class="d-grid">
+                        <button 
+                          type="submit" 
+                          class="btn btn-lg bg-gradient-info text-white rounded-3 shadow-sm">
+                          Edit 
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        <!-- </div> -->
+
+
+      </div>
+      
+      <%- include('includes/sub-footer') %>
+    </div>
+  </main>
+  <%- include('includes/config') %>
+  <!--   Core JS Files   -->
+  <%- include('includes/footer') %>
+

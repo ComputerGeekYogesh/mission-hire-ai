@@ -1,0 +1,10 @@
+<nav class="im-subnav" aria-label="Interview management">
+  <a href="/admin/interviews/dashboard" class="im-subnav__link <%= currentPath === '/admin/interviews/dashboard' || currentPath === '/admin/interviews' ? 'is-active' : '' %>">Dashboard</a>
+  <a href="/admin/interviews/scheduled" class="im-subnav__link <%= currentPath === '/admin/interviews/scheduled' ? 'is-active' : '' %>">Scheduled</a>
+  <a href="/admin/interviews/active" class="im-subnav__link <%= currentPath === '/admin/interviews/active' ? 'is-active' : '' %>">Active</a>
+  <a href="/admin/interviews/recordings" class="im-subnav__link <%= currentPath === '/admin/interviews/recordings' ? 'is-active' : '' %>">Recordings</a>
+  <a href="/admin/interviews/verification-logs" class="im-subnav__link <%= currentPath === '/admin/interviews/verification-logs' ? 'is-active' : '' %>">Verification</a>
+  <a href="/admin/interviews/flags" class="im-subnav__link <%= currentPath === '/admin/interviews/flags' ? 'is-active' : '' %>">Suspicious</a>
+  <a href="/admin/interviews/telemetry" class="im-subnav__link <%= currentPath === '/admin/interviews/telemetry' ? 'is-active' : '' %>">Telemetry</a>
+  <a href="/admin/interviews/analytics" class="im-subnav__link <%= currentPath === '/admin/interviews/analytics' ? 'is-active' : '' %>">Analytics</a>
+</nav>

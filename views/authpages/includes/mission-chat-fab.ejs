@@ -1,0 +1,43 @@
+<% const canRecruit = permissions?.['read:any_ai_chat_box']; %>
+<% if (typeof permissions !== 'undefined') { %>
+<div class="mission-chat-fab" id="mission-chat-fab" aria-live="polite">
+  <a href="/admin/interviews/schedule" class="mission-fab-trigger" id="mission-fab-trigger" aria-label="Mission Hire Chat">
+    <span class="mission-fab-bubble" aria-hidden="true">
+      <span class="mission-fab-greet mission-fab-greet-1">Mission</span>
+      <span class="mission-fab-greet mission-fab-greet-2">Hire ✦</span>
+      <span class="mission-fab-greet mission-fab-greet-3">Go →</span>
+    </span>
+    <span class="mission-fab-mascot" aria-hidden="true">
+      <svg class="mission-robot-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="missionRobotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#D4A24E"/>
+            <stop offset="100%" style="stop-color:#7C90F0"/>
+          </linearGradient>
+        </defs>
+        <ellipse class="mission-robot-shadow" cx="60" cy="108" rx="28" ry="6" fill="rgba(0,0,0,0.25)"/>
+        <g class="mission-robot-body">
+          <rect x="32" y="38" width="56" height="48" rx="14" fill="url(#missionRobotGrad)"/>
+          <rect x="40" y="48" width="40" height="28" rx="8" fill="#0b111b" opacity="0.35"/>
+          <circle class="mission-robot-eye mission-robot-eye-l" cx="48" cy="60" r="5" fill="#fff"/>
+          <circle class="mission-robot-eye mission-robot-eye-r" cx="72" cy="60" r="5" fill="#fff"/>
+          <circle class="mission-robot-pupil mission-robot-pupil-l" cx="49" cy="61" r="2.5" fill="#D4A24E"/>
+          <circle class="mission-robot-pupil mission-robot-pupil-r" cx="73" cy="61" r="2.5" fill="#D4A24E"/>
+          <path class="mission-robot-smile" d="M 50 72 Q 60 78 70 72" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <rect x="46" y="28" width="28" height="14" rx="6" fill="url(#missionRobotGrad)"/>
+          <circle cx="52" cy="35" r="3" fill="#D4A24E" class="mission-robot-antenna-dot"/>
+          <circle cx="68" cy="35" r="3" fill="#7C90F0" class="mission-robot-antenna-dot"/>
+        </g>
+        <g class="mission-robot-arm mission-robot-arm-wave">
+          <circle cx="22" cy="58" r="10" fill="url(#missionRobotGrad)"/>
+          <text x="22" y="63" text-anchor="middle" font-size="14">👋</text>
+        </g>
+        <g class="mission-robot-arm mission-robot-arm-right">
+          <circle cx="98" cy="62" r="9" fill="url(#missionRobotGrad)"/>
+        </g>
+      </svg>
+    </span>
+    <span class="mission-fab-pulse" aria-hidden="true"></span>
+  </a>
+</div>
+<% } %>

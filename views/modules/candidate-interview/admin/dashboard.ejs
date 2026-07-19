@@ -1,0 +1,83 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Interview Dashboard</h1>
+      <p class="im-page-sub">Overview of scheduled, live, and completed candidate sessions.</p>
+    </header>
+    <%- include('_nav') %>
+
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <div class="im-stat-card im-stat-card--gold">
+          <p class="im-stat-label">Total</p>
+          <p class="im-stat-value"><%= stats.total || 0 %></p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="im-stat-card im-stat-card--success">
+          <p class="im-stat-label">Completed</p>
+          <p class="im-stat-value"><%= stats.completed || 0 %></p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="im-stat-card im-stat-card--periwinkle">
+          <p class="im-stat-label">Active / Live</p>
+          <p class="im-stat-value"><%= stats.active || 0 %></p>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="im-stat-card im-stat-card--danger">
+          <p class="im-stat-label">Suspicious</p>
+          <p class="im-stat-value"><%= stats.suspicious || 0 %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="im-table-card mt-2">
+      <div class="card-header"><h6>Recent Sessions</h6></div>
+      <div class="table-responsive">
+        <table class="table align-items-center mb-0">
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Candidate</th>
+              <th>Email</th>
+              <th>Type</th>
+              <th>Scheduled</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% (recent || []).forEach(function(s, index) { %>
+            <tr>
+              <td><%= index + 1 %></td>
+              <td><%= s.candidate_name %></td>
+              <td class="text-sm text-muted"><%= s.candidate_email %></td>
+              <td><%= s.interview_type %></td>
+              <td><%= moment(s.scheduled_at).format('MMM D, YYYY HH:mm') %></td>
+              <td>
+                <span class="im-badge im-badge--<%= String(s.status || '').toLowerCase().replace(/\s+/g, '_') %>">
+                  <%= s.status %>
+                </span>
+              </td>
+              <td><a href="/admin/interviews/session/<%= s.id %>" class="btn btn-sm btn-outline-primary">View</a></td>
+            </tr>
+            <% }) %>
+            <% if (!(recent || []).length) { %>
+            <tr><td colspan="7" class="im-empty">No recent sessions yet.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

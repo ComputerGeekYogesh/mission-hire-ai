@@ -1,0 +1,451 @@
+<%
+  const nameParts = String(session.candidate_name || 'C').trim().split(/\s+/);
+  const candidateInitials = nameParts.slice(0, 2).map((p) => p[0]).join('').toUpperCase() || 'C';
+  const fs = flagSummary || {
+    total_flags: 0,
+    tab_switches: 0,
+    face_not_detected: 0,
+    low_light_detected: 0,
+    suspicious_activity: 0,
+  };
+%>
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=3" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+
+  <div class="container-fluid py-4 assessment-detail-page interview-admin-wrap">
+    <a href="/admin/interviews/scheduled" class="back-link">
+      <i class="bi bi-arrow-left"></i> Back to scheduled interviews
+    </a>
+
+    <% if (typeof success_msg !== 'undefined' && success_msg && success_msg.length) { %>
+    <div class="alert alert-success text-sm"><%= success_msg %></div>
+    <% } %>
+    <% if (typeof error_msg !== 'undefined' && error_msg && error_msg.length) { %>
+    <div class="alert alert-danger text-sm"><%= error_msg %></div>
+    <% } %>
+
+    <%- include('_nav') %>
+
+    <div class="card assessment-hero-card shadow-lg">
+      <div class="assessment-hero">
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          <div class="assessment-hero-avatar" aria-hidden="true"><%= candidateInitials %></div>
+          <div class="flex-grow-1 min-w-0">
+            <h1 class="assessment-hero-title"><%= session.candidate_name %></h1>
+            <p class="assessment-hero-sub">
+              Session #<%= session.id %> · <%= session.candidate_email %><% if (session.job_title) { %> · <%= session.job_title %><% } %>
+            </p>
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              <span class="badge assessment-hero-badge"><%= session.status %></span>
+              <span class="badge assessment-hero-badge"><%= session.interview_type %></span>
+              <% if (assessment) { %>
+              <span class="badge assessment-hero-badge">Score <%= assessment.average_score_display %>/<%= scoreScale %></span>
+              <span class="badge assessment-hero-badge"><%= assessment.result_status %></span>
+              <% } %>
+            </div>
+          </div>
+          <a href="/admin/interviews/scheduled" class="btn btn-dark btn-sm mb-0">Back</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-lg-9 mb-4">
+        <div class="card custom-card shadow-sm">
+          <div class="card-header bg-white border-0 pt-3 pb-0 px-3">
+            <ul class="nav nav-tabs border-0" id="sessionDetailTabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-flags-btn" data-bs-toggle="tab" data-bs-target="#tab-flags" type="button" role="tab">Flags (<%= flags.length %>)</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-telemetry-btn" data-bs-toggle="tab" data-bs-target="#tab-telemetry" type="button" role="tab">Telemetry</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-snaps-btn" data-bs-toggle="tab" data-bs-target="#tab-snaps" type="button" role="tab">Snapshots (<%= snapshots.length %>)</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-rec-btn" data-bs-toggle="tab" data-bs-target="#tab-rec" type="button" role="tab">Recording</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-verify-btn" data-bs-toggle="tab" data-bs-target="#tab-verify" type="button" role="tab">Verification</button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-summary-btn" data-bs-toggle="tab" data-bs-target="#tab-summary" type="button" role="tab">Summary</button>
+              </li>
+            </ul>
+          </div>
+          <div class="card-body tab-content px-3 pb-4 pt-3">
+            <div class="tab-pane fade show active" id="tab-flags" role="tabpanel">
+              <p class="section-title">Proctoring flags</p>
+              <div class="row g-2 mb-3">
+                <% const statItems = [
+                  { label: 'Total Flags', value: fs.total_flags },
+                  { label: 'Tab Switches', value: fs.tab_switches },
+                  { label: 'Face Not Detected', value: fs.face_not_detected },
+                  { label: 'Low Light', value: fs.low_light_detected },
+                  { label: 'Suspicious', value: fs.suspicious_activity },
+                ]; %>
+                <% statItems.forEach(function(item) { %>
+                <div class="col-6 col-md-4 col-xl-2">
+                  <div class="assessment-stat-card p-3 text-center h-100">
+                    <p class="stat-label mb-0"><%= item.label %></p>
+                    <p class="stat-value"><%= item.value %></p>
+                  </div>
+                </div>
+                <% }) %>
+              </div>
+              <div class="table-responsive border rounded-3">
+                <table class="table table-sm align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">#</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Type</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Timestamp</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Description</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Severity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% flags.forEach(function(f, i) { %>
+                    <tr>
+                      <td class="text-sm"><%= i + 1 %></td>
+                      <td class="text-sm"><%= f.flag_type %></td>
+                      <td class="text-sm"><%= moment(f.created_at).format('D MMM YYYY, h:mm:ss a') %></td>
+                      <td class="text-sm"><%= f.message || '—' %></td>
+                      <td>
+                        <span class="badge badge-sm bg-gradient-<%= f.severity === 'high' ? 'danger' : f.severity === 'medium' ? 'warning' : 'secondary' %>">
+                          <%= f.severity %>
+                        </span>
+                      </td>
+                    </tr>
+                    <% }) %>
+                    <% if (!flags.length) { %>
+                    <tr><td colspan="5" class="text-muted text-sm text-center py-4">No flags recorded for this session.</td></tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-telemetry" role="tabpanel">
+              <p class="section-title">Telemetry</p>
+              <div class="table-responsive border rounded-3" style="max-height:360px;overflow:auto">
+                <table class="table table-sm align-items-center mb-0">
+                  <thead>
+                    <tr>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Time</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Yaw</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Pitch</th>
+                      <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Face</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% telemetry.forEach(function(t) { %>
+                    <tr>
+                      <td class="text-sm"><%= t.recorded_at %></td>
+                      <td class="text-sm"><%= t.yaw %></td>
+                      <td class="text-sm"><%= t.pitch %></td>
+                      <td class="text-sm"><%= t.face_detected ? 'Y' : 'N' %></td>
+                    </tr>
+                    <% }) %>
+                    <% if (!telemetry.length) { %>
+                    <tr><td colspan="4" class="text-muted text-sm text-center py-3">No telemetry rows.</td></tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-snaps" role="tabpanel">
+              <p class="section-title">Snapshots</p>
+              <div class="d-flex flex-wrap gap-2">
+                <% snapshots.forEach(function(s) { %>
+                <a href="/admin/interviews/session/<%= session.id %>/snapshot/<%= s.id %>" target="_blank" rel="noopener">
+                  <img src="/admin/interviews/session/<%= session.id %>/snapshot/<%= s.id %>" class="border-radius-md shadow-sm" style="width:120px;height:90px;object-fit:cover" alt="Snapshot">
+                </a>
+                <% }) %>
+                <% if (!snapshots.length) { %>
+                <p class="text-muted text-sm mb-0">No snapshots captured.</p>
+                <% } %>
+              </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-rec" role="tabpanel">
+              <p class="section-title">Recordings</p>
+
+              <% if (mergedRecording) { %>
+              <div class="im-rec-panel">
+                <div class="im-rec-panel-head">
+                  <span class="im-rec-icon" aria-hidden="true"><i class="bi bi-camera-video-fill"></i></span>
+                  <div>
+                    <h6 class="im-rec-panel-title">Full interview recording</h6>
+                    <p class="im-rec-panel-sub">Complete browser session capture for reviewer playback</p>
+                  </div>
+                </div>
+                <div class="im-rec-video-wrap">
+                  <video controls class="im-rec-video" preload="metadata">
+                    <source src="/admin/interviews/recordings/<%= mergedRecording.id %>/play" type="video/webm">
+                  </video>
+                </div>
+                <div class="im-rec-actions">
+                  <a class="btn btn-sm im-btn-primary" href="/admin/interviews/recordings/<%= mergedRecording.id %>/play" target="_blank" rel="noopener">
+                    <i class="bi bi-box-arrow-up-right me-1"></i> Open in tab
+                  </a>
+                  <a class="btn btn-sm im-btn-ghost" href="/admin/interviews/recordings/<%= mergedRecording.id %>/download">
+                    <i class="bi bi-download me-1"></i> Download
+                  </a>
+                </div>
+                <p class="im-rec-meta">
+                  Merged from <%= chunkCount %> segment(s)<% if (mergedRecording.file_size_bytes) { %> · <%= Math.round(mergedRecording.file_size_bytes/1024/1024*10)/10 %> MB<% } %>
+                </p>
+              </div>
+              <% } else if (chunkCount > 0) { %>
+              <div class="im-rec-panel im-rec-empty">
+                <p class="im-rec-empty-title"><i class="bi bi-exclamation-triangle me-1"></i> Merge pending</p>
+                <p class="im-rec-empty-text">Recording segments (<%= chunkCount %>) uploaded — merge pending or failed.</p>
+                <form method="post" action="/admin/interviews/session/<%= session.id %>/remerge-recording">
+                  <button type="submit" class="btn btn-sm im-btn-warning">Merge recording now</button>
+                </form>
+              </div>
+              <% } else { %>
+              <div class="im-rec-panel im-rec-empty">
+                <p class="im-rec-empty-title"><i class="bi bi-camera-video-off me-1"></i> No recording yet</p>
+                <p class="im-rec-empty-text mb-0">The candidate must start and end the call in the browser room for a full recording to appear here.</p>
+              </div>
+              <% } %>
+
+              <% const answerRecs = (recordings || []).filter(function(r) { return r.recording_type === 'audio'; }); %>
+              <% if (qaDetail && qaDetail.length) { %>
+              <div class="im-rec-panel im-rec-qa-panel">
+                <div class="im-rec-panel-head">
+                  <span class="im-rec-icon im-rec-icon-alt" aria-hidden="true"><i class="bi bi-chat-square-text-fill"></i></span>
+                  <div>
+                    <h6 class="im-rec-panel-title">Question &amp; answer recordings</h6>
+                    <p class="im-rec-panel-sub"><%= qaDetail.length %> question(s) with per-answer audio clips</p>
+                  </div>
+                </div>
+                <div class="accordion im-qa-accordion" id="qaAccordion">
+                  <% qaDetail.forEach(function(row, idx) { %>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button class="accordion-button <%= idx ? 'collapsed' : '' %>" type="button" data-bs-toggle="collapse" data-bs-target="#qa-<%= row.id %>">
+                        <span class="im-qa-num">Q<%= row.question_order %></span>
+                        <span class="im-qa-label"><%= row.question_text.slice(0, 72) %><%= row.question_text.length > 72 ? '…' : '' %></span>
+                        <% if (row.score != null) { %><span class="im-qa-score">Score <%= row.score %>/<%= scoreScale %></span><% } %>
+                      </button>
+                    </h2>
+                    <div id="qa-<%= row.id %>" class="accordion-collapse collapse <%= idx === 0 ? 'show' : '' %>" data-bs-parent="#qaAccordion">
+                      <div class="accordion-body">
+                        <p class="im-qa-question"><%= row.question_text %></p>
+                        <% if (row.response_text) { %>
+                        <div class="im-qa-field">
+                          <span class="im-qa-field-label">Transcript</span>
+                          <p class="im-qa-field-value"><%= row.response_text %></p>
+                        </div>
+                        <% if (row.ai_feedback) { %>
+                        <div class="im-qa-field">
+                          <span class="im-qa-field-label">AI feedback</span>
+                          <p class="im-qa-field-value"><%= row.ai_feedback %></p>
+                        </div>
+                        <% } %>
+                        <% } else { %>
+                        <p class="im-qa-muted">Not answered yet.</p>
+                        <% } %>
+                        <% if (row.answer_recording_id) { %>
+                        <div class="im-qa-audio-wrap">
+                          <audio controls class="im-qa-audio" preload="metadata">
+                            <source src="/admin/interviews/recordings/<%= row.answer_recording_id %>/play" type="<%= row.answer_mime_type || 'audio/webm' %>">
+                          </audio>
+                        </div>
+                        <% } else { %>
+                        <p class="im-qa-muted im-qa-warn"><i class="bi bi-mic-mute me-1"></i> No answer audio file.</p>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+                  <% }) %>
+                </div>
+              </div>
+              <% } else if (answerRecs.length) { %>
+              <p class="text-sm mt-3 im-rec-meta">Answer audio files: <%= answerRecs.length %></p>
+              <% } %>
+            </div>
+
+            <div class="tab-pane fade" id="tab-verify" role="tabpanel">
+              <p class="section-title">Verification log</p>
+              <% verificationLogs.forEach(function(v) { %>
+              <div class="text-sm border-bottom py-2"><%= v.created_at %> — <%= v.event_type %> (<%= v.success ? 'ok' : 'fail' %>)</div>
+              <% }) %>
+              <% if (!verificationLogs.length) { %>
+              <p class="text-muted text-sm">No verification log entries.</p>
+              <% } %>
+            </div>
+
+            <div class="tab-pane fade" id="tab-summary" role="tabpanel">
+              <p class="section-title">Interview summary</p>
+              <% if (callSummary) { %>
+              <div class="im-summary-meta-row">
+                <span class="im-meta-chip"><i class="bi bi-hash"></i> <%= callSummary.mock_call_id %></span>
+                <span class="im-meta-chip"><i class="bi bi-clock"></i> <%= callSummary.duration_seconds || session.duration_seconds || '—' %> sec</span>
+              </div>
+
+              <% if (callSummary.mission_verdict || (missionRecs && missionRecs.length)) { %>
+              <div class="im-verdict-card">
+                <% if (callSummary.mission_verdict) { %>
+                <div class="im-verdict-head">
+                  <span class="im-verdict-badge"><i class="bi bi-stars me-1"></i> Mission Hire verdict</span>
+                </div>
+                <p class="im-verdict-body"><%= callSummary.mission_verdict %></p>
+                <% } %>
+                <% if (missionRecs && missionRecs.length) { %>
+                <div class="im-verdict-head im-verdict-head--recs">
+                  <span class="im-verdict-badge"><i class="bi bi-stars me-1"></i> Mission Hire recommendations</span>
+                </div>
+                <ul class="im-verdict-recs">
+                  <% missionRecs.forEach(function(r) { %><li><%= r %></li><% }) %>
+                </ul>
+                <% } %>
+              </div>
+              <% } %>
+
+              <% if (questionPlan) { %>
+              <div class="im-info-strip">
+                <i class="bi bi-list-check"></i>
+                <span><strong>Questions (<%= questionPlan.count %>)</strong> — <%= questionPlan.reason %></span>
+              </div>
+              <% } %>
+
+              <% if (assessment) { %>
+              <% const resultTone = assessment.result_status === 'Passed' ? 'pass' : (assessment.result_status === 'Terminated' ? 'terminated' : 'fail'); %>
+              <div class="im-score-grid">
+                <div class="im-score-card">
+                  <span class="im-score-label">Average score</span>
+                  <span class="im-score-value"><%= assessment.average_score_display %>/<%= scoreScale %></span>
+                  <span class="im-score-sub"><%= assessment.total_questions %> question(s)</span>
+                </div>
+                <div class="im-score-card">
+                  <span class="im-score-label">Result</span>
+                  <span class="im-result-pill im-result-<%= resultTone %>"><%= assessment.result_status %></span>
+                </div>
+                <div class="im-score-card im-score-card-wide">
+                  <span class="im-score-label">Feedback band</span>
+                  <span class="im-feedback-band"><%= feedbackDisplayLabel || assessment.feedback_status %></span>
+                </div>
+              </div>
+              <% } %>
+
+              <div class="im-questions-card">
+                <h6 class="im-questions-title">Questions asked</h6>
+                <ol class="im-questions-list">
+                  <% questions.forEach(function(q) { %>
+                  <li><%= q.question_text %></li>
+                  <% }) %>
+                </ol>
+              </div>
+
+              <div class="im-summary-actions">
+                <a class="btn btn-sm im-btn-primary" href="/admin/interviews/session/<%= session.id %>/summary/export" target="_blank" rel="noopener">
+                  <i class="bi bi-filetype-json me-1"></i> Export JSON
+                </a>
+                <% if (callSummary && callSummary.mock_call_id) { %>
+                <a class="btn btn-sm im-btn-ghost" href="/api/v1/user-call-summary?job_id=<%= encodeURIComponent(callSummary.mock_call_id) %>&email=<%= encodeURIComponent(session.candidate_email) %>" target="_blank" rel="noopener">
+                  Legacy API
+                </a>
+                <% } %>
+              </div>
+              <% } else if (session.ended_at || ['completed','suspicious','failed','terminated_due_to_proctoring_violation','cancelled'].includes(String(session.status || '').toLowerCase())) { %>
+              <div class="im-rec-panel im-rec-empty">
+                <p class="im-rec-empty-title"><i class="bi bi-journal-text me-1"></i> Summary not generated</p>
+                <p class="im-rec-empty-text mb-3">This interview has ended but the summary was not saved (often due to a transient error during completion). You can regenerate it now.</p>
+                <form method="post" action="/admin/interviews/session/<%= session.id %>/summary/regenerate" class="d-inline">
+                  <button type="submit" class="btn btn-sm im-btn-primary">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Regenerate summary
+                  </button>
+                </form>
+              </div>
+              <% } else { %>
+              <div class="im-rec-panel im-rec-empty">
+                <p class="im-rec-empty-title"><i class="bi bi-journal-text me-1"></i> Summary not ready</p>
+                <p class="im-rec-empty-text mb-0">Summary will appear after the candidate ends the in-app call.</p>
+              </div>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-3 mb-4">
+        <div class="card custom-card shadow-sm sticky-top" style="top: 1.5rem;">
+          <div class="card-body p-3">
+            <p class="text-xs text-uppercase text-muted fw-bold mb-2">On this page</p>
+            <nav class="nav flex-column assessment-page-nav mb-3" id="sessionPageNav">
+              <button class="nav-link active text-start" type="button" data-bs-toggle="tab" data-bs-target="#tab-flags">Flags</button>
+              <button class="nav-link text-start" type="button" data-bs-toggle="tab" data-bs-target="#tab-telemetry">Telemetry</button>
+              <button class="nav-link text-start" type="button" data-bs-toggle="tab" data-bs-target="#tab-snaps">Snapshots</button>
+              <button class="nav-link text-start" type="button" data-bs-toggle="tab" data-bs-target="#tab-rec">Recording</button>
+              <button class="nav-link text-start" type="button" data-bs-toggle="tab" data-bs-target="#tab-verify">Verification</button>
+              <button class="nav-link text-start" type="button" data-bs-toggle="tab" data-bs-target="#tab-summary">Summary</button>
+            </nav>
+
+            <p class="text-xs text-uppercase text-muted fw-bold mb-2">Contact &amp; details</p>
+            <ul class="list-unstyled text-xs mb-3">
+              <li class="mb-2"><span class="text-muted d-block">Email</span><%= session.candidate_email %></li>
+              <li class="mb-2"><span class="text-muted d-block">Phone</span><%= session.candidate_phone || '—' %></li>
+              <li class="mb-2"><span class="text-muted d-block">Scheduled</span><%= moment(session.scheduled_at).format('lll') %></li>
+              <li class="mb-2"><span class="text-muted d-block">Expires</span><%= moment(session.expires_at).format('lll') %></li>
+              <li class="mb-2"><span class="text-muted d-block">OTP</span><%= session.otp_verified ? 'Verified' : 'Pending' %></li>
+              <li class="mb-2"><span class="text-muted d-block">Preflight</span><%= session.preflight_completed ? 'OK' : 'Pending' %></li>
+            </ul>
+
+            <label class="text-xs text-muted">Interview link</label>
+            <input class="form-control form-control-sm outlined-input mb-2" readonly value="<%= interviewUrl %>">
+
+            <div class="d-grid gap-2">
+              <form method="post" action="/admin/interviews/session/<%= session.id %>/resend-invite">
+                <button type="submit" class="btn btn-sm btn-info w-100">Resend invite</button>
+              </form>
+              <form method="post" action="/admin/interviews/session/<%= session.id %>/complete">
+                <input type="hidden" name="suspicious" value="0">
+                <button type="submit" class="btn btn-sm btn-success w-100">Mark complete</button>
+              </form>
+              <form method="post" action="/admin/interviews/session/<%= session.id %>/cancel" onsubmit="return confirm('Cancel session?')">
+                <button type="submit" class="btn btn-sm btn-outline-danger w-100">Cancel session</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>
+<script>
+  (function () {
+    const tabButtons = document.querySelectorAll('#sessionDetailTabs .nav-link, #sessionPageNav .nav-link');
+    tabButtons.forEach(function (btn) {
+      btn.addEventListener('shown.bs.tab', function (e) {
+        const target = e.target.getAttribute('data-bs-target');
+        if (!target) return;
+        document.querySelectorAll('#sessionPageNav .nav-link, #sessionDetailTabs .nav-link').forEach(function (link) {
+          const match = link.getAttribute('data-bs-target') === target;
+          link.classList.toggle('active', match);
+        });
+      });
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    const tabParam = params.get('tab');
+    if (tabParam) {
+      const tabBtn = document.querySelector('[data-bs-target="#tab-' + tabParam + '"]');
+      if (tabBtn && window.bootstrap && bootstrap.Tab) {
+        bootstrap.Tab.getOrCreateInstance(tabBtn).show();
+      }
+    }
+  })();
+</script>

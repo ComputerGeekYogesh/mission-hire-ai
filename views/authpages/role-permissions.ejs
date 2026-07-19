@@ -1,0 +1,147 @@
+<%- include('includes/header') %>
+<body class="g-sidenav-show  bg-gray-100">
+    <%- include('includes/sidebar') %>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <%- include('includes/navbar') %>
+    <!-- End Navbar -->
+     <style>
+  .custom-card {
+    border: 2px solid #cce7ff !important; /* force override */
+    border-radius: 12px !important;
+    transition: 0.3s ease-in-out;
+    background: #f3f3f3a3 !important;
+  }
+  .custom-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    transform: translateY(-3px);
+  }
+
+  .job-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000205;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  white-space: nowrap;       /* Prevents text from wrapping */
+  overflow: hidden;          /* Hides overflow text */
+  text-overflow: ellipsis;   /* Shows "..." for long text */
+}
+</style>
+    <div class="container-fluid py-2 min-vh-100">
+      <div class="row">
+            <div class="col-12">
+                <div class="card my-4">
+                     <div class="card-header p-0 position-relative ">
+                      <div class=" border-radius-lg pt-4 pb-2 d-flex justify-content-between align-items-center">
+                          <h6 class="text-dark text-capitalize ps-3">Role Permissions</h6>
+                          <a href="/admin/roles" class="btn btn-info btn-sm me-5">Back</a>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      <div class="row">
+          <div class="col-12">
+            <div class="card shadow-lg border-0 rounded-3">
+              <!-- <div class="bg-gradient-info border-radius-lg pt-4 pb-2 d-flex justify-content-between align-items-center">
+                  <h6 class="text-white text-capitalize ps-3">Role Permissions</h6>
+                  <a href="/admin/roles" class="btn btn-primary btn-sm me-5">Back</a>
+              </div> -->
+              <div class="card-body px-4 py-4">
+                <div class="row justify-content-center">
+                  <div class="col-md-8">
+                    <table class="table table-bordered bg-white">
+                      <thead class="table-light">
+                        <tr>
+                          <th>Resource</th>
+                          <th>Create</th>
+                          <th>Read</th>
+                          <th>Update</th>
+                          <th>Delete</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                          <% 
+                            // Group permissions by resource
+                            const grouped = {};
+                            permission.forEach(p => {
+                              if (!grouped[p.resource]) grouped[p.resource] = [];
+                              grouped[p.resource].push(p);
+                            });
+
+                            for (const [resource, perms] of Object.entries(grouped)) { 
+                          %>
+                            <tr>
+                              <td class="resource-name"><%= resource %></td>
+                              <% ['create', 'read', 'update', 'delete'].forEach(action => { 
+                                  const perm = perms.find(p => p.action === action);
+                              %>
+                                <td>
+                                  <% if (perm) { %>
+                                    <input 
+                                      type="checkbox" 
+                                      class="perm-checkbox"
+                                      data-permission-id="<%= perm.id %>"
+                                      data-action="<%= perm.action %>"
+                                      data-resource="<%= perm.resource %>"
+                                      <%= assignedPermissionIds.includes(perm.id) ? 'checked' : '' %>
+                                    >
+                                  <% } else { %>
+                                    <span>-</span>
+                                  <% } %>
+                                </td>
+                              <% }) %>
+                            </tr>
+                          <% } %>
+                        </tbody>
+                    </table>
+                    <div class="text-end mt-3">
+                      <button id="savePermissions" class="btn btn-info px-4">Save Changes</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      <input type="hidden" id="roleId" value="<%= roleId %>">
+
+      </div>
+
+      <script>
+        document.getElementById("savePermissions").addEventListener("click", () => {
+          const roleId = document.getElementById("roleId").value;
+          const permission = [];
+
+          document.querySelectorAll(".perm-checkbox").forEach(cb => {
+            if (cb.checked) {
+              permission.push({
+                resource: cb.dataset.resource,
+                action: cb.dataset.action
+              });
+            }
+          });
+
+          console.log(permission);
+
+          fetch(`/admin/roles/${roleId}/permissions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ permission })
+          })
+          .then(res => res.json())
+          .then(data => alert(data.message || 'Permissions updated successfully!'))
+          .catch(err => console.error(err));
+          window.location.href = '/admin/roles';
+        });
+</script>
+      <%- include('includes/sub-footer') %>
+    </div>
+  </main>
+  <%- include('includes/config') %>
+  <!--   Core JS Files   -->
+  <%- include('includes/footer') %>
+

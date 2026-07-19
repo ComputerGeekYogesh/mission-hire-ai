@@ -1,0 +1,117 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Telemetry Reports</h1>
+      <p class="im-page-sub">Proctoring samples per interview session — head pose, faces, mic/camera, and flags.</p>
+    </header>
+    <%- include('_nav') %>
+
+    <form method="get" class="im-filter-card telemetry-filters-card">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Search candidate</label>
+          <input name="search" class="form-control form-control-sm" placeholder="Name or email" value="<%= filters.search || '' %>">
+        </div>
+        <div class="col-md-4">
+          <label class="form-label d-block">Display</label>
+          <label class="form-check text-sm">
+            <input type="checkbox" name="all_samples" value="1" <%= filters.all_samples === '1' ? 'checked' : '' %>>
+            Show every sample (default: latest per session only)
+          </label>
+          <label class="form-check text-sm mt-1">
+            <input type="checkbox" name="suspicious" value="1" <%= filters.suspicious === '1' ? 'checked' : '' %>>
+            Suspicious only
+          </label>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-sm btn-primary w-100">
+            <i class="bi bi-funnel me-1"></i> Filter
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div class="im-panel-card telemetry-legend mb-3 p-3">
+      <div class="row g-2 text-sm">
+        <div class="col-md-3"><span class="telemetry-legend-k">Yaw / Pitch</span> Head turn &amp; tilt (degrees)</div>
+        <div class="col-md-2"><span class="telemetry-legend-k">Faces</span> Face count in frame</div>
+        <div class="col-md-2"><span class="telemetry-legend-k">Mic / Cam</span> Device on/off</div>
+        <div class="col-md-3"><span class="telemetry-legend-k">Flag</span> Server-marked suspicious sample</div>
+        <div class="col-md-2 text-muted">Rows highlighted when flagged</div>
+      </div>
+    </div>
+
+    <div class="im-table-card telemetry-table-card">
+      <div class="table-responsive">
+        <table class="table table-sm mb-0 telemetry-table">
+          <thead>
+            <tr>
+              <th>S.No</th>
+              <th>Time</th>
+              <th>Candidate</th>
+              <th>Email</th>
+              <th>Job</th>
+              <th title="Head yaw (left/right)">Yaw</th>
+              <th title="Head pitch (up/down)">Pitch</th>
+              <th title="Faces detected">Faces</th>
+              <th>Mic</th>
+              <th>Cam</th>
+              <th>Flag</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          <% if (rows && rows.length) { %>
+          <% rows.forEach(function(r, index) { %>
+            <tr class="<%= r.suspicious_flag ? 'telemetry-row-flagged' : '' %>">
+              <td><%= (listOffset || 0) + index + 1 %></td>
+              <td class="text-nowrap"><%= moment(r.recorded_at).format('MMM D, HH:mm:ss') %></td>
+              <td><strong><%= r.candidate_name %></strong></td>
+              <td class="text-sm telemetry-email"><%= r.candidate_email %></td>
+              <td class="text-sm"><%= r.job_title || '—' %></td>
+              <td><%= r.yaw != null ? Number(r.yaw).toFixed(1) : '—' %></td>
+              <td><%= r.pitch != null ? Number(r.pitch).toFixed(1) : '—' %></td>
+              <td><%= r.face_count %></td>
+              <td>
+                <span class="badge <%= r.mic_active ? 'telemetry-badge-on' : 'telemetry-badge-off' %>">
+                  <%= r.mic_active ? 'On' : 'Off' %>
+                </span>
+              </td>
+              <td>
+                <span class="badge <%= r.camera_active ? 'telemetry-badge-on' : 'telemetry-badge-off' %>">
+                  <%= r.camera_active ? 'On' : 'Off' %>
+                </span>
+              </td>
+              <td>
+                <% if (r.suspicious_flag) { %>
+                  <span class="badge telemetry-badge-flag">Yes</span>
+                <% } else { %>
+                  <span class="text-muted">—</span>
+                <% } %>
+              </td>
+              <td>
+                <a class="btn btn-sm btn-outline-primary" href="/admin/interviews/session/<%= r.session_id %>">Session</a>
+              </td>
+            </tr>
+          <% }) %>
+          <% } else { %>
+            <tr>
+              <td colspan="12" class="im-empty">No telemetry records match your filters.</td>
+            </tr>
+          <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <%- include('_pagination', { total: total, filters: filters }) %>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+  <title><%= sessionLabels.pageTitle %></title>
+  <link rel="icon" type="image/svg+xml" href="/mission-favicon.svg?v=1" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link href="/modules/candidate-interview/css/interview.css" rel="stylesheet">
+
+</head>
+
+<body class="interview-room-full">
+
+  <div id="proctor-alert" class="proctor-alert d-none" role="alert"></div>
+
+  <div id="connection-banner" class="connection-banner d-none" role="status" aria-live="polite"></div>
+
+  <div
+    id="network-reconnect-overlay"
+    class="network-reconnect-overlay d-none"
+    role="alertdialog"
+    aria-live="assertive"
+    aria-modal="true"
+    aria-labelledby="network-reconnect-title"
+  >
+    <div class="network-reconnect-overlay-card">
+      <div
+        id="network-reconnect-spinner"
+        class="auto-submit-overlay-spinner network-reconnect-spinner"
+        role="status"
+        aria-hidden="true"
+      ></div>
+      <p id="network-reconnect-title" class="network-reconnect-title">
+        Internet connectivity issue detected
+      </p>
+      <p id="network-reconnect-message" class="network-reconnect-message">
+        Reconnecting<span id="network-reconnect-dots" class="network-reconnect-dots" aria-hidden="true"></span>
+      </p>
+      <p id="network-reconnect-restored" class="network-reconnect-restored d-none">
+        <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Connection restored
+      </p>
+      <button type="button" id="network-reconnect-retry" class="network-reconnect-retry d-none">
+        Retry connection
+      </button>
+    </div>
+  </div>
+
+  <div id="completion-screen" class="completion-screen">
+
+    <div class="completion-card">
+
+      <h2 id="completion-title"><%= sessionLabels.completionTitle %></h2>
+
+      <p id="completion-message" class="mb-0">Thank you for your time.</p>
+
+    </div>
+
+  </div>
+
+  <div id="proctoring-termination-screen" class="proctoring-termination-screen">
+
+    <div class="completion-card proctoring-termination-card">
+
+      <h2><%= sessionLabels.terminatedTitle %></h2>
+
+      <p class="mb-2"><%= sessionLabels.terminatedMessage %></p>
+
+    </div>
+
+  </div>
+
+
+
+  <div class="room-root">
+
+    <header class="room-topbar interview-room-header">
+
+      <div class="topbar-left room-header-brand">
+
+        <span class="topbar-name room-header-title"><%= session.candidate_name %></span>
+
+        <span class="topbar-sub room-header-sub"><%= session.job_title || sessionLabels.headerFallback %></span>
+
+      </div>
+
+      <div class="topbar-right d-flex align-items-center gap-2">
+
+        <span id="integrity-status-badge" class="integrity-status-badge integrity-ok d-none" title="Assessment integrity status">Integrity OK</span>
+
+        <span id="rec-indicator" class="room-rec-badge d-none"><span class="rec-dot"></span> REC</span>
+
+        <span id="room-status" class="room-ready-badge">Ready</span>
+
+      </div>
+
+    </header>
+
+
+
+    <main class="room-main interview-room-main">
+
+      <section class="room-video-panel interview-video-panel">
+
+        <div class="room-video-area">
+
+          <video id="room-video" autoplay playsinline muted></video>
+
+
+
+          <div class="video-overlays">
+
+            <div class="corner-tl" aria-hidden="true"></div>
+
+            <div class="corner-tr" aria-hidden="true"></div>
+
+            <div class="corner-bl" aria-hidden="true"></div>
+
+            <div class="corner-br" aria-hidden="true"></div>
+
+
+
+            <div id="room-live-badge" class="room-live-badge d-none" aria-hidden="true">
+
+              <span class="rec-dot"></span> Live
+
+            </div>
+
+
+
+            <div id="question-overlay" class="question-counter-overlay interview-video-overlay question-bar--audio-only" aria-live="polite">
+              <div class="q-counter-label">Question <span id="q-index">0</span> / <span id="q-total">0</span></div>
+              <div class="q-progress" id="q-progress" aria-hidden="true"></div>
+              <p id="q-audio-status" class="q-text q-text--status" aria-live="polite">Questions are audio only — listen carefully</p>
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="room-waveform" id="room-waveform" aria-hidden="true">
+
+          <i class="bi bi-mic-fill room-waveform-icon" aria-hidden="true"></i>
+
+          <div class="room-wave-bars" id="room-wave-bars">
+
+            <% for (let i = 1; i <= 20; i++) { %>
+
+              <div class="wave-bar a<%= i %>"></div>
+
+            <% } %>
+
+          </div>
+
+          <div class="auto-submit-volume room-wave-live"><div id="auto-submit-volume-bar"></div></div>
+
+          <span class="wave-time" id="room-wave-time"><span id="auto-submit-timer">0:00 / 5:00</span></span>
+
+        </div>
+
+
+
+        <div class="room-timer-bar">
+
+          <span class="timer-label">SESSION TIME</span>
+
+          <div class="timer-track"><div class="timer-fill" id="room-session-fill"></div></div>
+
+          <span class="timer-val" id="room-session-time">0:00</span>
+
+        </div>
+
+      </section>
+
+
+
+      <aside class="room-sidebar interview-side-panel">
+
+        <div class="sidebar-section room-control-card">
+
+          <div class="call-status">
+
+            <div class="call-status-icon" aria-hidden="true">
+
+              <i class="bi bi-headphones"></i>
+
+            </div>
+
+            <div>
+
+              <div class="call-status-label"><%= sessionLabels.callUiLabel %></div>
+
+              <div class="call-status-text">Headphones required</div>
+
+            </div>
+
+          </div>
+
+
+
+          <div id="speech-unsupported-banner" class="room-banner-warning d-none">
+
+            Your browser does not support voice recognition. You can still record video but must submit answers manually.
+
+          </div>
+
+
+
+          <div id="auto-submit-panel" class="auto-submit-panel d-none">
+
+            <div class="auto-submit-header">
+
+              <span class="auto-submit-rec-dot"></span>
+
+              <strong id="auto-submit-status">Ready to answer</strong>
+
+            </div>
+
+            <div id="auto-submit-transcript" class="auto-submit-transcript" aria-live="polite"></div>
+
+            <p id="auto-submit-prompt" class="auto-submit-prompt d-none"></p>
+
+            <p id="auto-submit-hint" class="auto-submit-hint d-none"></p>
+
+            <div id="auto-submit-countdown" class="auto-submit-countdown d-none"></div>
+
+          </div>
+
+
+
+          <div id="auto-submit-overlay" class="auto-submit-overlay d-none">
+
+            <div class="auto-submit-overlay-spinner" role="status"></div>
+
+            <p>Submitting your answer…</p>
+
+          </div>
+
+
+
+          <div class="room-actions">
+
+            <button type="button" id="btn-start" class="room-btn room-btn-primary">
+
+              <i class="bi bi-telephone-fill" aria-hidden="true"></i> Start Interview
+
+            </button>
+
+            <button type="button" id="btn-next-question" class="room-btn room-btn-next d-none" title="Submit your answer and go to the next question">
+
+              Next Question <i class="bi bi-arrow-right" aria-hidden="true"></i>
+
+            </button>
+
+            <button type="button" id="btn-play-question" class="room-btn room-btn-secondary" disabled title="Rephrase and replay the current question aloud">
+
+              <i class="bi bi-volume-up-fill" aria-hidden="true"></i> Repeat question
+
+            </button>
+
+            <p id="answer-rec-status" class="room-rec-status"></p>
+
+            <button type="button" id="btn-submit-answer" class="room-btn room-btn-submit" disabled title="Auto-submit is active during recording">
+
+              <i class="bi bi-check-lg" aria-hidden="true"></i> Submit Answer
+
+            </button>
+
+            <button type="button" id="btn-end" class="room-btn room-btn-danger" disabled>
+
+              <i class="bi bi-telephone-x-fill" aria-hidden="true"></i> End Call
+
+            </button>
+
+          </div>
+
+
+
+          <p class="hint-text room-control-note">Listen to the audio. Speak your answer when recording starts. Click Next Question when you are done, or wait for a prompt if you need help.</p>
+
+          <div id="room-alert" class="room-banner-danger d-none" role="alert"></div>
+
+          <p id="room-msg" class="room-msg"></p>
+
+        </div>
+
+
+
+        <div class="sidebar-section room-rules-card">
+
+          <div class="rules-header">
+
+            <i class="bi bi-shield-check" aria-hidden="true"></i>
+
+            <span class="rules-title">Suspicious activity rules</span>
+
+          </div>
+
+          <p class="rules-intro">First violation triggers an audio + visual warning. A second major violation after the warning <%= sessionLabels.rulesIntroTermination %> Confidence: <strong id="integrity-confidence-score">100</strong>/100.</p>
+
+
+
+          <div class="rule-item">
+
+            <div class="rule-icon danger"><i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i></div>
+
+            <div class="rule-text"><span class="rule-label">Tab / window</span> — switching tabs or minimizing for 20s+ between alerts</div>
+
+          </div>
+
+          <div class="rule-item">
+
+            <div class="rule-icon warn"><i class="bi bi-eye-slash-fill" aria-hidden="true"></i></div>
+
+            <div class="rule-text"><span class="rule-label">Face absent</span> — no face visible for ≥ <%= proctoring.faceAbsentSec %> seconds</div>
+
+          </div>
+
+          <div class="rule-item">
+
+            <div class="rule-icon warn"><i class="bi bi-arrow-left-right" aria-hidden="true"></i></div>
+
+            <div class="rule-text"><span class="rule-label">Looking away</span> — sustained for ≥ <%= proctoring.attentionSustainedSec %>s (yaw &gt; <%= proctoring.yawThreshold %>° or pitch &gt; <%= proctoring.pitchThreshold %>°)</div>
+
+          </div>
+
+          <div class="rule-item">
+
+            <div class="rule-icon danger"><i class="bi bi-camera-video-off-fill" aria-hidden="true"></i></div>
+
+            <div class="rule-text"><span class="rule-label">Camera off</span> — camera disabled or face not detected during call</div>
+
+          </div>
+
+          <div class="rule-item">
+
+            <div class="rule-icon info"><i class="bi bi-headphones" aria-hidden="true"></i></div>
+
+            <div class="rule-text"><span class="rule-label">Headphones removed</span> — disconnecting blocks answers until headphones are detected again</div>
+
+          </div>
+
+        </div>
+
+
+
+        <div class="sidebar-section room-log-card room-log-section">
+
+          <div class="log-header">
+
+            <span class="log-title">Proctoring log</span>
+
+            <span class="log-count"><span id="flag-count">0</span> events</span>
+
+          </div>
+
+          <ul class="interview-log room-log-list" id="proctor-log">
+
+            <li class="room-log-item list-group-item">Waiting to start…</li>
+
+          </ul>
+
+        </div>
+
+      </aside>
+
+    </main>
+
+  </div>
+
+
+
+  <script>
+
+    window.INTERVIEW_TOKEN = '<%= token %>';
+    window.INTERVIEW_SESSION_ID = <%= session.id %>;
+
+    window.INTERVIEW_SESSION_LABELS = <%- JSON.stringify(clientSessionLabels) %>;
+
+    window.INTERVIEW_TYPE = '<%= session.interview_type %>';
+
+    window.INTERVIEW_CANDIDATE_NAME = <%- JSON.stringify(session.candidate_name || '') %>;
+
+    window.INTERVIEW_USE_VAPI_TTS = <%= vapiTtsEnabled ? 'true' : 'false' %>;
+
+    window.INTERVIEW_RECORDING_FINAL_ONLY = <%= recordingFinalOnly ? 'true' : 'false' %>;
+
+    window.INTERVIEW_RECORDING_MAX_BYTES = <%= recordingMaxBytes || 157286400 %>;
+
+    window.INTERVIEW_RECORDING_TRACE = <%= recordingTraceEnabled ? 'true' : 'false' %>;
+
+    window.INTERVIEW_ATTENTION_CONFIG = <%- JSON.stringify({
+      analysisWindowMs: (proctoring.attentionWindowSec || 12) * 1000,
+      preAnswerGlanceMs: Math.max(2800, (proctoring.attentionSustainedSec || 5) * 560),
+    }) %>;
+
+    window.INTERVIEW_PROCTORING_STRIKES = {
+      finalWarning: <%= proctoring.finalWarningStrike || 4 %>,
+      termination: <%= proctoring.terminationStrike || 5 %>,
+    };
+
+    window.INTERVIEW_VERIFIED_FACE_SIGNATURE = <%- JSON.stringify(typeof verifiedFaceSignature !== 'undefined' ? verifiedFaceSignature : null) %>;
+
+  </script>
+
+  <script src="/modules/candidate-interview/js/interview-voice.js"></script>
+
+  <script src="/modules/candidate-interview/js/headphone-device-detect.js"></script>
+
+  <script src="/modules/candidate-interview/js/face-detect.js"></script>
+
+  <script src="/modules/candidate-interview/js/silence-detector.js"></script>
+
+  <script src="/modules/candidate-interview/js/question-repeat-request-intent.js"></script>
+
+  <script src="/modules/candidate-interview/js/assessment-intent-client.js"></script>
+
+  <script src="/modules/candidate-interview/js/auto-submit-answer.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+
+  <script src="/modules/candidate-interview/js/recording-client.js"></script>
+
+  <script src="/modules/candidate-interview/js/question-repeat-detect.js"></script>
+
+  <script src="/modules/candidate-interview/js/gaze-cheat-detector.js"></script>
+
+  <script src="/modules/candidate-interview/js/attention-monitor.js"></script>
+
+  <script src="/modules/candidate-interview/js/phone-detector.js"></script>
+
+  <script src="/modules/candidate-interview/js/webcam-obstruction-detect.js"></script>
+
+  <script src="/modules/candidate-interview/js/integrity-monitor.js"></script>
+
+  <script src="/modules/candidate-interview/js/telemetry.js"></script>
+
+  <script src="/modules/candidate-interview/js/proctoring-violation-messages.js"></script>
+
+  <script src="/modules/candidate-interview/js/proctoring-client-log.js"></script>
+
+  <script src="/modules/candidate-interview/js/call-connectivity-monitor.js"></script>
+
+  <script src="/modules/candidate-interview/js/room.js"></script>
+
+</body>
+
+</html>
+
+

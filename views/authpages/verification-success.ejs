@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Email Verified</title>
+  <style>
+    /* Very small, self-contained styles so you don't need extra CSS files */
+    :root {
+      --bg: #f7fafc;
+      --card: #ffffff;
+      --accent: #2563eb;
+      --muted: #6b7280;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: var(--bg);
+      color: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(15,23,42,0.08);
+      padding: 28px;
+      max-width: 540px;
+      width: 100%;
+      text-align: center;
+    }
+    .icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(37,99,235,0.06));
+      color: var(--accent);
+      font-size: 30px;
+    }
+    h1 { margin: 8px 0 4px; font-size: 20px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+    .email {
+      display: inline-block;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 6px 12px rgba(37,99,235,0.18);
+    }
+    .secondary {
+      display: inline-block;
+      margin-left: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    footer { margin-top: 18px; color: #9ca3af; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon">✓</div>
+    <h1>Email verified</h1>
+    <p>Your email has been successfully verified.</p>
+
+    <% if (typeof email !== 'undefined' && email) { %>
+      <div class="email"><%= email %></div>
+    <% } %>
+
+    <div style="margin-top:16px;">
+      <!-- Replace /login with the actual route of your app -->
+      <a class="btn" href="/">Go to login</a>
+      <!-- <a class="secondary" href="/">Back to homepage</a> -->
+    </div>
+
+    <footer>
+      If you didn't expect this verification, please contact support or ignore this message.
+    </footer>
+  </div>
+</body>
+</html>

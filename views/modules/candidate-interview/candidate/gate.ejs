@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en" class="js-gate-pending">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Interview Verification</title>
+  <link rel="icon" type="image/svg+xml" href="/mission-favicon.svg?v=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/modules/candidate-interview/css/interview.css" rel="stylesheet">
+  <script src="/modules/candidate-interview/js/mobile-device-detect.js"></script>
+  <script src="/modules/candidate-interview/js/chrome-browser-detect.js"></script>
+</head>
+<body class="interview-gate-bg">
+  <script>
+    document.documentElement.classList.remove('js-gate-pending');
+    window.__INTERVIEW_MOBILE__ = isMobileDevice();
+    window.__INTERVIEW_CHROME_OK__ = !window.__INTERVIEW_MOBILE__ && isChromeBrowser();
+
+    if (window.__INTERVIEW_MOBILE__) {
+      document.documentElement.classList.add('interview-mobile-blocked');
+    } else if (window.__INTERVIEW_CHROME_OK__) {
+      document.documentElement.classList.add('interview-chrome-ok');
+    } else {
+      document.documentElement.classList.add('interview-chrome-blocked');
+    }
+  </script>
+
+  <div
+    id="mobile-device-restriction"
+    class="gate-overlay gate-restriction-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="mobile-restriction-heading"
+  >
+    <div class="gate-modal">
+      <div class="gate-modal-body">
+        <div class="gate-icon-wrap mobile-restriction-icon-wrap" aria-hidden="true">
+          <svg class="mobile-restriction-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="7" y="2" width="10" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+            <line x1="4" y1="4" x2="20" y2="20"/>
+          </svg>
+        </div>
+        <h1 id="mobile-restriction-heading" class="gate-heading">Mobile Devices Not Supported</h1>
+        <p class="gate-subtitle">
+          Video assessments must be completed on a desktop or laptop computer.
+        </p>
+        <p class="mobile-restriction-instruction">
+          Please open this link on your desktop computer using Google Chrome browser.
+        </p>
+        <div class="chrome-restriction-link-row">
+          <input
+            type="text"
+            id="mobile-restriction-link"
+            class="chrome-restriction-link-input"
+            readonly
+            aria-label="Assessment invitation link"
+          >
+          <button type="button" id="mobile-restriction-copy-btn" class="chrome-restriction-copy-btn">
+            Copy link
+          </button>
+        </div>
+        <p id="mobile-restriction-copy-confirm" class="chrome-restriction-copy-confirm d-none" role="status">
+          Copied!
+        </p>
+        <button type="button" id="mobile-restriction-desktop-btn" class="gate-btn-primary">
+          Open on Desktop
+        </button>
+        <p id="mobile-restriction-desktop-msg" class="mobile-restriction-desktop-msg d-none" role="status">
+          Link copied. Open Google Chrome on your desktop computer and paste the link into the address bar.
+        </p>
+        <p class="chrome-restriction-note">
+          Copy the link above and paste it into Chrome on your desktop.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div
+    id="chrome-browser-restriction"
+    class="gate-overlay gate-restriction-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="chrome-restriction-heading"
+  >
+    <div class="gate-modal">
+      <div class="gate-modal-body">
+        <div class="gate-icon-wrap chrome-restriction-icon-wrap" aria-hidden="true">
+          <svg class="chrome-restriction-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="24" cy="24" r="22" fill="#fff"/>
+            <path fill="#EA4335" d="M24 8c6.2 0 11.8 2.8 15.5 7.2L28.8 26.4H12.1C10.8 22.8 10.5 19 11.4 15.2 12.3 11.4 14.4 8.1 17.3 5.8 19.4 7.2 21.6 8 24 8z"/>
+            <path fill="#FBBC04" d="M39.5 15.2c1.6 3.1 2.5 6.6 2.5 10.3 0 2.1-.3 4.1-.9 6.1H24V26.4h15.1z"/>
+            <path fill="#34A853" d="M24 40c-4.8 0-9.1-2-12.2-5.2l7.1-5.8c1.6 1.1 3.5 1.7 5.5 1.7 2.1 0 4-.6 5.6-1.7L39 34.8C35.9 38 30.2 40 24 40z"/>
+            <path fill="#4285F4" d="M11.4 32.8C10.5 29 10.8 25.2 12.1 21.6H24v4.8H15.8c.5 1.6 1.4 3 2.5 4.2l-6.9 5.6z"/>
+            <circle cx="24" cy="24" r="9" fill="#fff"/>
+            <circle cx="24" cy="24" r="7" fill="#4285F4"/>
+          </svg>
+        </div>
+        <h1 id="chrome-restriction-heading" class="gate-heading">This assessment requires Google Chrome</h1>
+        <p class="gate-subtitle">
+          Video assessments must be completed in Google Chrome.
+          Please copy the link below or open this page in Chrome.
+        </p>
+        <div class="chrome-restriction-link-row">
+          <input
+            type="text"
+            id="chrome-restriction-link"
+            class="chrome-restriction-link-input"
+            readonly
+            aria-label="Assessment invitation link"
+          >
+          <button type="button" id="chrome-restriction-copy-btn" class="chrome-restriction-copy-btn">
+            Copy link
+          </button>
+        </div>
+        <p id="chrome-restriction-copy-confirm" class="chrome-restriction-copy-confirm d-none" role="status">
+          Copied!
+        </p>
+        <a
+          href="https://www.google.com/chrome/"
+          class="gate-btn-primary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Download Google Chrome
+        </a>
+        <p class="chrome-restriction-note">
+          Already have Chrome? Paste the copied link into Chrome's address bar.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div id="gate-assessment-content" class="gate-overlay" role="presentation">
+    <div class="gate-modal" role="dialog" aria-labelledby="gate-heading" aria-modal="true">
+      <% 
+        const rawEmail = session.candidate_email || '';
+        const emailParts = rawEmail.split('@');
+        const maskedEmail = rawEmail && emailParts[1]
+          ? emailParts[0].charAt(0) + '***@' + emailParts[1]
+          : 'your email';
+      %>
+      <% if (verified) { %>
+        <div class="gate-modal-body text-center">
+          <div class="gate-icon-wrap" aria-hidden="true">
+            <svg class="gate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <polyline points="9 12 11 14 15 10"/>
+            </svg>
+          </div>
+          <h1 id="gate-heading" class="gate-heading">Already verified</h1>
+          <p class="gate-subtitle">You can continue to device checks.</p>
+          <a href="/interview/<%= session.session_token %>/preflight" class="gate-btn-primary">Continue</a>
+        </div>
+      <% } else { %>
+        <div class="gate-modal-body">
+          <div class="gate-icon-wrap" aria-hidden="true">
+            <svg class="gate-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <h1 id="gate-heading" class="gate-heading">Verify Your Identity</h1>
+          <p class="gate-subtitle">
+            We sent a 6-digit code to<br>
+            <strong class="gate-email"><%= maskedEmail %></strong>
+          </p>
+
+          <button type="button" id="btn-send-otp" class="gate-btn-send d-none">Send verification code</button>
+
+          <div class="gate-otp-row" id="gate-otp-row">
+            <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1" data-index="0">
+            <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 2" data-index="1">
+            <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 3" data-index="2">
+            <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 4" data-index="3">
+            <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 5" data-index="4">
+            <input type="text" class="otp-digit" maxlength="1" inputmode="numeric" pattern="[0-9]*" aria-label="Digit 6" data-index="5">
+          </div>
+          <input type="hidden" id="otp-input" value="" autocomplete="one-time-code">
+
+          <p id="gate-otp-error" class="gate-error d-none" role="alert"></p>
+
+          <p class="gate-resend-line">
+            <span class="gate-resend-muted">Didn't receive a code?</span>
+            <button type="button" id="btn-resend-otp" class="gate-resend-link" disabled>
+              <span id="resend-label">Resend in</span> <span id="resend-countdown">0:45</span>
+            </button>
+          </p>
+
+          <button type="button" id="btn-verify-otp" class="gate-btn-primary" disabled>Verify Now</button>
+
+          <p id="gate-msg" class="gate-status" role="status"></p>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <script>
+    window.INTERVIEW_TOKEN = '<%= session.session_token %>';
+    window.GATE_CANDIDATE_NAME = <%- JSON.stringify(session.candidate_name || '') %>;
+  </script>
+  <script>
+    (function () {
+      var src;
+      if (window.__INTERVIEW_MOBILE__) {
+        src = '/modules/candidate-interview/js/mobile-restriction.js';
+      } else if (window.__INTERVIEW_CHROME_OK__) {
+        src = '/modules/candidate-interview/js/gate.js';
+      } else {
+        src = '/modules/candidate-interview/js/chrome-restriction.js';
+      }
+      var script = document.createElement('script');
+      script.src = src;
+      document.body.appendChild(script);
+    })();
+  </script>
+</body>
+</html>

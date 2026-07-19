@@ -1,0 +1,36 @@
+<nav class="navbar navbar-main navbar-expand-lg mission-topbar shadow-none border-radius-xl" id="navbarBlur" data-scroll="false">
+  <div class="container-fluid py-0 px-0">
+    <div class="d-flex flex-wrap align-items-center justify-content-between w-100 gap-2">
+      <div class="flex-grow-1 min-w-0">
+        <h5 class="mb-0 text-truncate">Welcome back<% if (typeof name !== 'undefined' && name) { %>, <%= name %><% } %></h5>
+        <p class="text-muted text-sm mb-0 d-none d-sm-block">Mission Hire · video interview AI assistant</p>
+      </div>
+      <div class="dropdown mission-header-profile" data-bs-display="static">
+        <a
+          href="javascript:;"
+          class="d-flex align-items-center gap-2 text-decoration-none mission-profile-trigger dropdown-toggle"
+          id="headerProfileDropdown"
+          role="button"
+          data-bs-toggle="dropdown"
+          data-bs-auto-close="true"
+          aria-expanded="false"
+        >
+          <span class="mission-profile-avatar">
+            <i class="bi bi-person-fill"></i>
+          </span>
+          <span class="d-none d-md-inline text-sm fw-semibold mission-profile-name">
+            <%= (typeof name !== 'undefined' && name) ? name : (typeof email !== 'undefined' ? email : 'Admin') %>
+          </span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow-lg" aria-labelledby="headerProfileDropdown">
+          <li>
+            <a class="dropdown-item d-flex align-items-center text-danger" href="/logout">
+              <i class="material-symbols-rounded me-2 text-danger opacity-8">logout</i>
+              <span>Logout</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>

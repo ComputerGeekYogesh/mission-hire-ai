@@ -1,0 +1,35 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Active Interviews</h1>
+      <p class="im-page-sub">Live sessions in progress — open a card to monitor proctoring and recordings.</p>
+    </header>
+    <%- include('_nav') %>
+    <div class="row">
+      <% sessions.forEach(function(s) { %>
+      <div class="col-md-4 mb-3">
+        <div class="im-live-card">
+          <span class="im-badge im-badge--live im-live-pulse">LIVE</span>
+          <h6><%= s.candidate_name %></h6>
+          <p class="text-sm text-muted mb-1"><%= s.candidate_email %></p>
+          <p class="text-xs text-muted mb-0">Status: <strong><%= s.status %></strong></p>
+          <a href="/admin/interviews/session/<%= s.id %>" class="btn btn-sm btn-primary mt-3">Monitor</a>
+        </div>
+      </div>
+      <% }) %>
+      <% if (!sessions.length) { %>
+      <div class="col-12">
+        <div class="im-panel-card im-empty">No active sessions right now.</div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

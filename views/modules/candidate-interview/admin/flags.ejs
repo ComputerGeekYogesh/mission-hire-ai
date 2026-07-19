@@ -1,0 +1,64 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Suspicious Activity Logs</h1>
+      <p class="im-page-sub">Proctoring flags raised during candidate interviews.</p>
+    </header>
+    <%- include('_nav') %>
+    <form method="get" class="im-filter-card">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Severity</label>
+          <select name="severity" class="form-select">
+            <option value="">All severity</option>
+            <option value="low" <%= filters.severity==='low'?'selected':'' %>>Low</option>
+            <option value="medium" <%= filters.severity==='medium'?'selected':'' %>>Medium</option>
+            <option value="high" <%= filters.severity==='high'?'selected':'' %>>High</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-check text-sm mt-4">
+            <input type="checkbox" name="unresolved" value="1" <%= filters.unresolved==='1'?'checked':'' %>> Unresolved only
+          </label>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100">Apply</button>
+        </div>
+      </div>
+    </form>
+    <div class="im-table-card table-responsive">
+      <table class="table mb-0">
+        <thead><tr><th>S.No</th><th>Time</th><th>Candidate</th><th>Email</th><th>Type</th><th>Severity</th><th>Message</th><th></th></tr></thead>
+        <tbody>
+        <% flags.forEach(function(f, index) { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= moment(f.created_at).format('MMM D HH:mm') %></td>
+            <td><%= f.candidate_name %></td>
+            <td class="text-sm text-muted"><%= f.candidate_email || '—' %></td>
+            <td><%= f.flag_type %></td>
+            <td><span class="badge bg-<%= f.severity==='high'?'danger':f.severity==='medium'?'warning':'secondary' %>"><%= f.severity %></span></td>
+            <td><%= f.message %></td>
+            <td>
+              <% if (!f.resolved) { %>
+              <form method="post" action="/admin/interviews/flags/<%= f.id %>/resolve" style="display:inline"><button class="btn btn-xs btn-outline-success btn-sm">Resolve</button></form>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (!flags.length) { %>
+          <tr><td colspan="8" class="im-empty">No flags match your filters.</td></tr>
+        <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

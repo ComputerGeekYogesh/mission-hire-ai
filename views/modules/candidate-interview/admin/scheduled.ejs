@@ -1,0 +1,70 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Scheduled Interviews</h1>
+      <p class="im-page-sub">Search and filter upcoming and past candidate sessions.</p>
+    </header>
+    <%- include('_nav') %>
+    <form class="im-filter-card" method="get">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label">Search</label>
+          <input name="search" class="form-control" placeholder="Name or email" value="<%= filters.search || '' %>">
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-select">
+            <option value="">All statuses</option>
+            <% statuses.forEach(st => { %>
+            <option value="<%= st %>" <%= filters.status===st?'selected':'' %>><%= st %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">From</label>
+          <input type="date" name="date_from" class="form-control" value="<%= filters.date_from || '' %>">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100">Filter</button>
+        </div>
+      </div>
+    </form>
+    <div class="im-table-card">
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead><tr><th>S.No</th><th>Candidate</th><th>Email</th><th>Job</th><th>Type</th><th>Scheduled</th><th>Status</th><th></th></tr></thead>
+          <tbody>
+            <% sessions.forEach((s, index) => { %>
+            <tr>
+              <td><%= (listOffset || 0) + index + 1 %></td>
+              <td><%= s.candidate_name %></td>
+              <td class="text-sm text-muted"><%= s.candidate_email %></td>
+              <td><%= s.job_title || '-' %></td>
+              <td><%= s.interview_type %></td>
+              <td><%= moment(s.scheduled_at).format('MMM D HH:mm') %></td>
+              <td>
+                <span class="im-badge im-badge--<%= String(s.status || '').toLowerCase().replace(/\s+/g, '_') %>">
+                  <%= s.status %>
+                </span>
+              </td>
+              <td><a class="btn btn-sm btn-outline-primary" href="/admin/interviews/session/<%= s.id %>">Details</a></td>
+            </tr>
+            <% }) %>
+            <% if (!sessions.length) { %>
+            <tr><td colspan="8" class="im-empty">No sessions match your filters.</td></tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <%- include('_pagination', { total: total, filters: filters }) %>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

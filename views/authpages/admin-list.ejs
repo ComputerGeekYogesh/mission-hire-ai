@@ -1,0 +1,122 @@
+<%- include('includes/header') %>
+<body class="g-sidenav-show  bg-gray-100">
+    <%- include('includes/sidebar') %>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <%- include('includes/navbar') %>
+    <!-- End Navbar -->
+     <style>
+  .custom-card {
+    border: 2px solid #cce7ff !important; /* force override */
+    border-radius: 12px !important;
+    transition: 0.3s ease-in-out;
+    background: #f3f3f3a3 !important;
+  }
+  .custom-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    transform: translateY(-3px);
+  }
+
+  .job-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000205;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  white-space: nowrap;       /* Prevents text from wrapping */
+  overflow: hidden;          /* Hides overflow text */
+  text-overflow: ellipsis;   /* Shows "..." for long text */
+}
+</style>
+    <div class="container-fluid py-2 min-vh-100 ">
+      <div class="row mb-4">
+          <div class="col-9">
+            <!-- <h3 class="mb-0 h4 font-weight-bolder">Dashboard</h3>
+            <p class="mb-4">
+              Overview
+            </p> -->
+          </div>
+
+          <div class="col-3">
+              <% if (permissions?.['read:any_dropdown']) { %>
+              <select 
+                name="company_id" 
+                id="change_account" 
+                class="form-select form-select-sm rounded-3 shadow-sm" required>
+                  <option value="">Select an Account</option>
+                  
+                      <% companies.forEach(company => { %>
+                       <option 
+                        value="<%= company.id %>" 
+                        <%= Number(selectedCompanyId) === Number(company.id) ? 'selected' : '' %>>
+                        <%= company.name %>
+                      </option>
+                      <% }) %>
+              </select>
+              <% } %>
+          </div>
+      </div>
+      <div class="row">
+            <div class="col-12">
+                <div class="card ">
+                     <div class="card-header p-0 position-relative ">
+                        <div class=" border-radius-lg pt-4 pb-2 d-flex justify-content-between align-items-center">
+                            <h6 class="text-dark text-capitalize ps-3 mb-0">Users List</h6>
+                            <a href="/admin/add" class="btn btn-info btn-sm me-4">Add Users</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+           
+            <div class="col-12 mt-4">
+              <div class="card ">
+                <div class="card-body px-0 ml-2">
+                  <div class="table-responsive p-3">
+                    <table class="table align-items-center mb-0">
+                      <thead>
+                        <tr>
+                          <th class=" text-center text-uppercase text-dark text-xs font-weight-bolder ">Recruiter Id</th>
+                          <th class=" text-center text-uppercase text-dark text-xs font-weight-bolder ">Name</th>
+                          <th class=" text-center text-uppercase text-dark text-xs font-weight-bolder ">Email</th>
+                          <th class=" text-center text-uppercase text-dark text-xs font-weight-bolder ">Role</th>
+                          <th class=" text-center text-uppercase text-dark text-xs font-weight-bolder ">Company</th>
+                          <th class="text-center text-uppercase text-dark text-xs font-weight-bolder ">created_at</th>
+                          <th class="text-center text-uppercase text-dark text-xs font-weight-bolder ">action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <% if (admins && admins.length) { %>
+                          <% admins.forEach((admin, index) => { %>
+                            <tr>
+                              <td><p class="text-sm text-center font-weight-bold mb-0"><%= index + 1 %></p></td>
+                              <td><p class="text-sm mb-0 text-center "><%= admin.name %></p></td>
+                              <td><p class="text-sm mb-0 text-center "><%= admin.email %></p></td>
+                              <td><p class="text-sm mb-0 text-center "><%= admin.role_name %></p></td>
+                              <td><p class="text-sm mb-0 text-center "><%= admin.company_name %></p></td>
+                              <td class="text-center"><span class="text-xs font-weight-bold"><%= new Date(admin.created_at).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) %></span></td>
+                              <td class="text-end text-center ">
+                                <a href="/admin/edit/<%= admin.id %>" class="btn btn-sm btn-info">Edit</a>
+                                <!-- <a href="/admin/delete/<%= admin.id %>" class="btn btn-sm btn-danger">Delete</a> -->
+                              </td>
+                            </tr>
+                          <% }) %>
+                        <% } else { %>
+                          <tr>
+                            <td colspan="6" class="text-center text-muted">No User found.</td>
+                          </tr>
+                        <% } %>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+    </div>
+      
+    <%- include('includes/sub-footer') %>
+  </div>
+</main>
+  <%- include('includes/config') %>
+  <!--   Core JS Files   -->
+  <%- include('includes/footer') %>
+

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Device Check</title>
+  <link rel="icon" type="image/svg+xml" href="/mission-favicon.svg?v=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="/modules/candidate-interview/css/interview.css" rel="stylesheet">
+</head>
+<body class="preflight-page-wrap">
+  <div class="preflight-page">
+    <div class="preflight-card">
+      <div class="preflight-card-header">
+        <h1 class="preflight-card-title">Camera &amp; microphone check</h1>
+        <p class="preflight-card-sub">Allow permissions. Headphones are mandatory for the interview.</p>
+      </div>
+
+      <div class="preflight-card-body">
+        <div class="preflight-video-col">
+          <div class="preflight-video-frame">
+            <video id="preflight-video" autoplay playsinline muted></video>
+            <canvas id="preflight-overlay" class="d-none" aria-hidden="true"></canvas>
+            <div class="preflight-corner preflight-corner-tl" aria-hidden="true"></div>
+            <div class="preflight-corner preflight-corner-tr" aria-hidden="true"></div>
+            <div class="preflight-corner preflight-corner-bl" aria-hidden="true"></div>
+            <div class="preflight-corner preflight-corner-br" aria-hidden="true"></div>
+            <div id="preflight-live-pip" class="preflight-live-pip d-none">
+              <span class="preflight-live-dot"></span>
+              Live preview
+            </div>
+            <div id="preflight-media-checking" class="preflight-media-checking d-none" aria-live="polite">
+              <div class="preflight-media-checking-inner">
+                <div class="preflight-media-checking-spinner" role="status" aria-label="Checking devices"></div>
+                <p>Checking camera and microphone…</p>
+              </div>
+            </div>
+          </div>
+          <div id="preflight-audio-meter" class="preflight-audio-meter d-none" aria-hidden="true">
+            <span class="preflight-audio-meter-label"><i class="bi bi-mic-fill" aria-hidden="true"></i> Mic level</span>
+            <div class="preflight-audio-meter-track"><div id="preflight-audio-meter-fill"></div></div>
+          </div>
+        </div>
+
+        <div class="preflight-info-col">
+          <div class="preflight-status-group" id="checklist">
+            <div class="preflight-status-row" id="chk-camera">
+              <div class="preflight-status-label">
+                <i class="bi bi-camera-video" aria-hidden="true"></i>
+                Camera
+              </div>
+              <div class="preflight-status-val val-pending" data-status-val>pending</div>
+            </div>
+            <div class="preflight-status-row" id="chk-mic">
+              <div class="preflight-status-label">
+                <i class="bi bi-mic" aria-hidden="true"></i>
+                Microphone
+              </div>
+              <div class="preflight-status-val val-pending" data-status-val>pending</div>
+            </div>
+            <div class="preflight-status-row" id="chk-face">
+              <div class="preflight-status-label">
+                <i class="bi bi-eye" aria-hidden="true"></i>
+                Face detected
+              </div>
+              <div class="preflight-status-val val-pending" data-status-val>pending</div>
+            </div>
+            <div class="preflight-status-row preflight-status-row-last" id="chk-headphones">
+              <div class="preflight-status-label">
+                <i class="bi bi-headphones" aria-hidden="true"></i>
+                Headphones
+              </div>
+              <div class="preflight-status-val val-text" data-status-val>pending</div>
+            </div>
+          </div>
+
+          <div id="preflight-media-error" class="preflight-media-error d-none" role="alert">
+            <div class="preflight-media-error-icon" aria-hidden="true">
+              <i class="bi bi-camera-video-off"></i>
+            </div>
+            <h2 id="preflight-media-error-title" class="preflight-media-error-title">Could not access camera or microphone</h2>
+            <p id="preflight-media-error-body" class="preflight-media-error-body"></p>
+            <p id="preflight-media-error-hint" class="preflight-media-error-hint d-none"></p>
+            <button type="button" id="preflight-media-retry" class="preflight-media-retry-btn">
+              <i class="bi bi-arrow-clockwise" aria-hidden="true"></i> Retry
+            </button>
+          </div>
+
+          <div class="preflight-warn-box">
+            <div class="preflight-warn-header">
+              <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+              <span class="preflight-warn-title">Headphones required</span>
+              <span class="preflight-warn-meta">wired or Bluetooth</span>
+            </div>
+
+            <div id="hp-no-headphones-error" class="preflight-hp-hard-error d-none" role="alert">
+              No headphones detected. Please connect wired or Bluetooth headphones to continue.
+            </div>
+
+            <div id="hp-setup-panel" class="d-none">
+              <p class="preflight-hp-uncertain-copy mb-2">
+                Select your <strong>headphone</strong> output, stay <strong>silent</strong>, play the test tone, then confirm you heard it in your headset only.
+              </p>
+
+              <label class="preflight-hp-select-label" for="hp-output-select">Headphone output device</label>
+              <select id="hp-output-select" class="form-select form-select-sm preflight-hp-select mb-2" aria-label="Headphone output device">
+                <option value="">No headphone devices found</option>
+              </select>
+
+              <ul class="preflight-device-list" id="headphone-device-list" role="listbox" aria-label="Headphone output devices"></ul>
+
+              <div class="preflight-hp-actions">
+                <button type="button" id="hp-play-test-tone" class="btn btn-sm btn-outline-primary preflight-hp-tone-btn" disabled>
+                  <i class="bi bi-play-fill" aria-hidden="true"></i> Play Test Tone
+                </button>
+              </div>
+
+              <div id="hp-tone-confirm" class="preflight-hp-tone-confirm d-none">
+                <p class="mb-2">Did you hear the tone in your headphones?</p>
+                <button type="button" id="hp-tone-yes" class="btn btn-sm btn-success" disabled>
+                  Yes, I heard it in my headphones
+                </button>
+              </div>
+            </div>
+
+            <p class="preflight-blocked-note">USB headsets often appear as <strong>Speakers (USB Audio Device)</strong> or your brand name — not as "Headphones". Built-in <strong>Realtek speakers</strong> are blocked. Play the test tone to confirm audio plays through your headset.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="preflight-card-footer">
+        <button type="button" id="btn-complete-preflight" class="preflight-continue-btn" disabled>
+          <i class="bi bi-arrow-right" aria-hidden="true"></i>
+          Continue to interview room
+        </button>
+        <p id="preflight-msg" class="preflight-msg"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    window.INTERVIEW_TOKEN = '<%= token %>';
+    window.INTERVIEW_USE_VAPI_TTS = <%= vapiTtsEnabled ? 'true' : 'false' %>;
+  </script>
+  <script src="/modules/candidate-interview/js/interview-voice.js"></script>
+  <script src="/modules/candidate-interview/js/headphone-device-detect.js"></script>
+  <script src="/modules/candidate-interview/js/face-detect.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script type="module" src="/modules/candidate-interview/js/preflight-init.js"></script>
+</body>
+</html>

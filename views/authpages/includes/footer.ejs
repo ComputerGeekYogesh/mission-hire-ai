@@ -1,0 +1,343 @@
+<!--   Core JS Files   -->
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999">
+  <div id="flashToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body" id="flashToastBody">Action successful!</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+
+<!-- reject  modal -->
+    <div class="modal" id="rejectModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+     
+      <div class="modal-header">
+        <h5 class="modal-title">Tell us what went wrong?</h5>
+      </div>
+ 
+      <div class="modal-body">
+ 
+        <label><strong>Select reason(s)</strong></label>
+      <div class="form-check">
+  <input class="form-check-input" type="checkbox" name="rejectReason[]" value="Inaccurate" id="reason1" required>
+  <label class="form-check-label" for="reason1">Inaccurate</label>
+</div>
+ 
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" name="rejectReason[]" value="Incomplete" id="reason2">
+  <label class="form-check-label" for="reason2">Incomplete</label>
+</div>
+ 
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" name="rejectReason[]" value="Biased, toxic, or harmful" id="reason3">
+  <label class="form-check-label" for="reason3">Biased, toxic, or harmful</label>
+</div>
+ 
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" name="rejectReason[]" value="Inappropriate tone or style" id="reason4">
+  <label class="form-check-label" for="reason4">Inappropriate tone or style</label>
+</div>
+ 
+<div class="form-check">
+  <input class="form-check-input" type="checkbox" name="rejectReason[]" value="Other" id="reason5">
+  <label class="form-check-label" for="reason5">Other</label>
+</div>
+ 
+        <br>
+        <label><strong>Tell us more</strong></label>
+        <textarea id="rejectReason" class="form-control" placeholder="Give feedback..."></textarea>
+ 
+      </div>
+ 
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button onclick="submitRejection()" class="btn btn-primary">Submit</button>
+      </div>
+ 
+    </div>
+  </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const cards = document.querySelectorAll('.llm-card');
+const modal = document.getElementById('modal');
+const modalTitle = document.getElementById('modalTitle');
+ 
+const apiKeyInput = document.getElementById('apiKeyInput');
+const baseUrlInput = document.getElementById('baseUrlInput');
+const modelInput = document.getElementById('modelSelect');
+ 
+ 
+// All LLaMA models
+const llamaModels = [
+  { value: "llama-3.2-1b", label: "LLaMA 3.2 - 1B" },
+  { value: "llama-3.1-8b-instruct", label: "LLaMA 3.1 - 8B Instruct" },
+  { value: "llama-3.1-70b-instruct", label: "LLaMA 3.1 - 70B Instruct" },
+  { value: "llama-3.2-3b", label: "LLaMA 3.2 - 3B" },
+  { value: "llama-guard-3", label: "LLaMA Guard 3" }
+];
+ 
+cards.forEach(card => {
+  card.addEventListener('click', () => {
+ 
+    document.querySelector('.llm-card.selected')?.classList.remove('selected');
+    card.classList.add('selected');
+ 
+    const llmName = card.dataset.llm;
+    modalTitle.textContent = `${llmName} Configuration`;
+    modal.style.display = 'grid';
+ 
+    // RESET fields
+    apiKeyInput.value = "";
+    baseUrlInput.value = "";
+    modelInput.innerHTML = ""; // clear dropdown
+ 
+    // DYNAMIC LOGIC
+    if (llmName === "LLaMA") {
+ 
+      baseUrlInput.placeholder = "eg, https://api.llama-provider.com";
+ 
+      // Insert models dynamically
+      llamaModels.forEach(model => {
+        const option = document.createElement("option");
+        option.value = model.value;
+        option.textContent = model.label;
+        modelInput.appendChild(option);
+      });
+ 
+    } else {
+baseUrlInput.placeholder = "https://example.com";
+      // Placeholder when NOT LLaMA
+      const option = document.createElement("option");
+      option.textContent = "Select Model";
+      option.disabled = true;
+      option.selected = true;
+      modelInput.appendChild(option);
+    }
+  });
+});
+// Close modal
+function closeModal() {
+    modal.style.display = 'none';
+}
+ 
+// Close on background click
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const successMsg = <%- JSON.stringify(Array.isArray(success_msg) ? (success_msg[0] || '') : (success_msg || '')) %>;
+  const errorMsg = <%- JSON.stringify(Array.isArray(error_msg) ? (error_msg[0] || '') : (error_msg || '')) %>;
+  const skipSwalFlash = Boolean(document.getElementById('callSettingsFlash'));
+
+  const swalBase = {
+    background: '#1e293b',
+    color: '#f8fafc',
+    confirmButtonColor: '#2563eb',
+  };
+
+  if (successMsg && !skipSwalFlash) {
+    Swal.fire({
+      ...swalBase,
+      icon: 'success',
+      title: 'Success',
+      text: successMsg,
+      timer: 2500,
+      showConfirmButton: false,
+    });
+  } else if (errorMsg && !skipSwalFlash) {
+    Swal.fire({
+      ...swalBase,
+      icon: 'error',
+      title: 'Error',
+      text: errorMsg,
+      timer: 3000,
+      showConfirmButton: false,
+    });
+  }
+});
+</script>
+
+<script>
+  document.getElementById('change_account').addEventListener('change', function() {
+    const companyId = this.value;
+    fetch('/admin/update-role-session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ company_id: companyId })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        // Optionally refresh the page to apply the new role
+        location.reload();
+      } else {
+        alert('Failed to update role in session.');
+      }
+    })
+    .catch(err => console.error('Error:', err));
+  });
+  </script>
+
+
+<!-- 
+<script src="../assets/js/core/popper.min.js"></script>
+<script src="../assets/js/core/bootstrap.min.js"></script>
+<script src="../assets/js/plugins/perfect-scrollbar.min.js"></script>
+<script src="../assets/js/plugins/smooth-scrollbar.min.js"></script> -->
+
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Github buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+<script src="../assets/js/material-dashboard.min.js?v=3.2.0"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+  let selectedFeedbackId = null;
+ 
+function toggleApprove(id) {
+  const approveBtn = document.getElementById(`approve_${id}`);
+  const rejectBtn = document.getElementById(`reject_${id}`);
+ 
+  // Toggle green state
+  approveBtn.classList.toggle("glow-green");
+ 
+  // If approve becomes active, remove red from reject
+  if (approveBtn.classList.contains("glow-green")) {
+    rejectBtn.classList.remove("glow-red");
+  }
+}
+ 
+function toggleReject(id) {
+  $('#rejectModal').modal('show');
+  const approveBtn = document.getElementById(`approve_${id}`);
+  const rejectBtn = document.getElementById(`reject_${id}`);
+ 
+  // Toggle red state
+  rejectBtn.classList.toggle("glow-red");
+ 
+  // If reject becomes active, remove green from approve
+  if (rejectBtn.classList.contains("glow-red")) {
+    approveBtn.classList.remove("glow-green");
+  }
+}
+function submitRejection() {
+  const checkedBoxes = document.querySelectorAll('.form-check-input:checked');
+ 
+  if (checkedBoxes.length === 0) {
+    alert("Please select at least one reason.");
+    return; // stop here
+  }
+ 
+  const reasons = Array.from(checkedBoxes).map(cb => cb.value);
+  const extraFeedback = document.getElementById("rejectReason").value;
+ 
+  $.ajax({
+    url: '/admin/feedback/reject',
+    method: 'POST',
+    data: {
+      id: selectedFeedbackId,
+      reason: reasons,
+      extraFeedback: extraFeedback,
+    },
+success: function() {
+      Swal.fire({
+        icon: 'success',
+        title: 'Submitted!',
+        text: 'Your feedback has been recorded.',
+        confirmButtonText: 'OK'
+      });
+    },
+    error: function() {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Something went wrong, please try again later.'
+      });
+    }
+  });
+}
+</script>
+
+ <script>
+/**
+ * formatAnyPhoneClient
+ * - raw: string that may contain +, 00, letters, spaces, etc.
+ * - opts.defaultCountry: optional string country code (e.g. "91") to use when no explicit country code exists.
+ * Returns formatted string or original raw if it cannot be formatted.
+ */
+function formatAnyPhoneClient(raw, opts = {}) {
+  if (raw === null || raw === undefined) return "";
+  const defaultCountry = opts.defaultCountry || ""; // e.g. "91" if you want to default to India
+
+  // keep only digits
+  let digits = String(raw).replace(/\D/g, "");
+
+  // if there are leading international-zeros (00) they are already digits; we'll just treat digits uniformly
+  // need at least 10 digits for local number
+  if (digits.length < 10) {
+    // not enough digits to form a 10-digit local number -> return original raw
+    return raw;
+  }
+
+  // last 10 digits are the local number
+  const local = digits.slice(-10);
+  const countryCodePart = digits.slice(0, digits.length - 10); // may be empty
+
+  const a = local.slice(0, 3);
+  const b = local.slice(3, 6);
+  const c = local.slice(6);
+
+  // If country code part exists, use it. Otherwise, use defaultCountry if provided.
+  const country = countryCodePart || defaultCountry;
+
+  if (country) {
+    return `+${country} (${a}) ${b}-${c}`;
+  } else {
+    // No country code available: return local number formatted without +country
+    return `(${a}) ${b}-${c}`;
+  }
+}
+
+/**
+ * formatAllPhonesOnPage
+ * - selector: CSS selector for elements that contain raw phone text (defaults to '.phone')
+ * - options: passed to formatAnyPhoneClient
+ */
+function formatAllPhonesOnPage(selector = '.phone', options = {}) {
+  document.querySelectorAll(selector).forEach(el => {
+    // Some elements may contain other markup; read only textContent
+    const raw = el.dataset.rawPhone !== undefined ? el.dataset.rawPhone : el.textContent;
+    const trimmed = raw ? String(raw).trim() : "";
+    if (!trimmed) return;
+
+    const formatted = formatAnyPhoneClient(trimmed, options);
+    el.textContent = formatted;
+  });
+}
+
+// Auto-run when DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+  // If you want to force a default country when there's no code in the DB, pass { defaultCountry: "91" }
+  formatAllPhonesOnPage('.phone'); // or formatAllPhonesOnPage('.phone', { defaultCountry: "91" });
+});
+</script>
+
+<%- include('mission-chat-fab') %>
+
+</body>
+
+</html>

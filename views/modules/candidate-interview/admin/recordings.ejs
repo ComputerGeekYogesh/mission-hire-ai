@@ -1,0 +1,55 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Interview Recordings</h1>
+      <p class="im-page-sub">Playback and download candidate interview media.</p>
+    </header>
+    <%- include('_nav') %>
+    <form method="get" class="im-filter-card">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label">Search</label>
+          <input name="search" class="form-control" placeholder="Search candidate" value="<%= filters.search || '' %>">
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-primary w-100" type="submit">Search</button>
+        </div>
+      </div>
+    </form>
+    <div class="im-table-card table-responsive">
+      <table class="table mb-0">
+        <thead><tr><th>S.No</th><th>Candidate</th><th>Email</th><th>Type</th><th>Size</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>
+        <% recordings.forEach(function(r, index) { %>
+          <tr>
+            <td><%= index + 1 %></td>
+            <td><%= r.candidate_name %></td>
+            <td class="text-sm text-muted"><%= r.candidate_email || '—' %></td>
+            <td><%= r.recording_type %></td>
+            <td><%= r.file_size_bytes ? Math.round(r.file_size_bytes/1024)+' KB' : '-' %></td>
+            <td><%= r.created_at %></td>
+            <td>
+              <% if (r.recording_type === 'video') { %>
+              <a class="btn btn-sm btn-outline-primary" href="/admin/interviews/recordings/<%= r.id %>/play" target="_blank">Play</a>
+              <a class="btn btn-sm btn-outline-secondary" href="/admin/interviews/recordings/<%= r.id %>/download">Download</a>
+              <% } %>
+              <a class="btn btn-sm btn-outline-info" href="/admin/interviews/session/<%= r.session_id %>">Session</a>
+            </td>
+          </tr>
+        <% }) %>
+        <% if (!recordings.length) { %>
+          <tr><td colspan="7" class="im-empty">No recordings found.</td></tr>
+        <% } %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

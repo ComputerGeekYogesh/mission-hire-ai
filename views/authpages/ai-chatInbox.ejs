@@ -1,0 +1,1363 @@
+<%- include('includes/header') %>
+
+  <body class="g-sidenav-show bg-gray-100">
+    <%- include('includes/sidebar') %>
+      <main class="main-content position-relative mission-chat-layout border-radius-lg">
+        <%- include('includes/navbar') %>
+
+          <!-- Right Sidebar (chat history) -->
+          <div class="sidebar-overlay" id="sidebar-overlay"></div>
+          <div class="right-sidebar" id="right-sidebar">
+            <div class="sidebar-header">
+              <h4>📁 Chat History</h4>
+              <button class="close-sidebar" id="close-sidebar">&times;</button>
+            </div>
+            <div class="sidebar-content">
+              <ul class="sidebar-list" id="sidebar-list">
+                <!-- Items will be populated by JavaScript -->
+              </ul>
+            </div>
+          </div>
+          <style>
+            * {
+              box-sizing: border-box;
+            }
+            html, body {
+              overflow-x: hidden;
+            }
+
+            .mission-chat-page {
+              overflow: hidden;
+            }
+
+            .chat-wrapper {
+              display: flex;
+              flex-direction: column;
+              flex: 1;
+              min-height: 0;
+              width: 100%;
+              max-width: 100%;
+              margin: 0;
+              background: #141c2b;
+              border-radius: 16px;
+              box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+              overflow: hidden;
+              border: 1px solid rgba(148, 163, 184, 0.12);
+            }
+
+            /* //////////////////////////// */
+
+            /* Centered input (initial state) */
+              /* .input-container.centered {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 80%;
+                max-width: 900px;
+                background: #f9fafb;
+                border-radius: 12px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+                padding: 12px;
+                z-index: 30;
+                display: flex;
+                align-items: center;
+              } */
+
+              .input-container.centered {
+                  position: absolute;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  width: 80%;
+                  max-width: 900px;
+                  background: #141c2b;
+                  border-radius: 100px;
+                  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+                  padding: 12px;
+                  z-index: 30;
+                  display: flex;
+                  align-items: center;
+
+                  /* NEW: prevent vertical shift when typing */
+                
+                }
+
+              /* Bottom input (normal chat input) */
+              .input-container.bottom {
+                position: static;
+                transform: none;
+                width: 100%;
+                padding: 12px 15px;
+                box-shadow: none;
+                border-radius: 0 0 12px 12px;
+              }
+
+              /* When input is bottom, give chat-window room */
+              .chat-window.with-input {
+                padding-bottom: 110px; /* adjust to fit input height */
+              }
+
+              /* Transition for smooth movement */
+              .input-container {
+                transition: all 300ms ease;
+              }
+
+              /* make textarea full width in centered mode */
+              .input-container.centered #user-input {
+                width: 100%;
+                padding: 12px 14px;
+                border-radius: 10px;
+                resize: none;
+                height: 48px;
+              }
+              .input-container.centered.rectangle {
+                  border-radius: 25px;  /* rectangle with small rounded corners */
+                  /* padding: 13px 15px;   optional: adjust padding */
+              }
+
+
+              /* ensure the UI for bottom mode uses original style */
+              .input-container.bottom #user-input {
+                flex: 1;
+                padding: 12px 15px;
+                border-radius: 24px;
+                height: auto;
+              }
+
+              /* small tweak to the mic/send area */
+              .mic-button { margin-left: 10px; flex-shrink: 0; }
+              #send-button { margin-left: 10px; flex-shrink: 0; }
+
+              /* hide by default (you already use hide class) */
+              .input-container.hide { display: none !important; }
+
+            /* ////////////////////////////// */
+            .chat-header {
+              padding: 16px 20px;
+              text-align: center;
+              font-size: 1.6rem;
+              font-weight: 600;
+              color: #fff;
+              border-bottom: 1px solid #eee;
+              background: #2d81efc2;
+            }
+
+            .button-container {
+              z-index: 2; /* higher so it's clickable */
+              pointer-events: auto !important;
+            }
+          
+            .chat-window {
+              flex: 1;
+              padding: 20px;
+              overflow-y: auto;
+              background-color: #111827;
+              display: flex;
+              flex-direction: column;
+              scrollbar-width: thin;
+              scrollbar-color: #ccc transparent;
+              pointer-events: auto; /* ensure it's not blocking */
+              z-index: 1;
+              height: auto !important; /* adjust as needed */
+              overflow-y: auto;
+              padding: 10px;
+              position: relative;
+              display: flex;
+              /* flex-direction: column; messages stack from top */
+              min-height: 0;
+              flex: 1 !important;
+            }
+
+             .chat-window {
+              height: auto !important; /* adjust as needed */
+              overflow-y: auto;
+              padding: 10px;
+              position: relative;
+              display: flex;
+              /* flex-direction: column; messages stack from top */
+              min-height: 0;
+              flex: 1 !important;
+            }
+          
+            .chat-window::-webkit-scrollbar {
+              width: 6px;
+            }
+            .chat-window::-webkit-scrollbar-thumb {
+              background: #ccc;
+              border-radius: 4px;
+            }
+          
+            .message {
+              margin-bottom: 14px;
+              max-width: 80%;
+              line-height: 1.5;
+              padding: 12px 16px;
+              border-radius: 12px;
+              font-size: 15px;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+            }
+          
+            .user-message {
+              align-self: flex-end;
+              background-color: #dcf2ff;
+              color: #111;
+              border-bottom-right-radius: 4px;
+            }
+          
+            .bot-message {
+              align-self: flex-start;
+              background-color: #f1f1f1;
+              color: #111;
+              border-bottom-left-radius: 4px;
+            }
+
+            .bot-message-centered {
+                  align-self: center;       /* centers the message horizontally */
+                  /* background-color: white; */
+                  color: #111;
+                  border-radius: 12px;      /* rounded on all corners */
+                  padding: 10px 16px;
+                  max-width: 60%;           /* optional: limits width */
+                  text-align: center;       /* optional: center text inside */
+                  margin: 160px 0;
+                  font-size: xx-large;
+                  color: #a09c9c;            /* vertical spacing between messages */
+              }
+
+            .bold-message {
+              align-self: flex-start;
+              background-color: #f1f1f1;
+              color: #111111cf;
+              border-bottom-left-radius: 4px;
+              padding: 10px 16px;
+              font-weight: bold;
+            }
+          
+            .input-container {
+              border-top: 1px solid #ddd;
+              padding: 12px 15px;
+              background-color: #f9fafb;
+              display: flex;
+              align-items: center;
+              border-radius: 12px;
+            }
+          
+            #user-input {
+              background: #ffffff;
+              border: none;
+              /* border-radius: 20px;
+              padding: 14px 18px; */
+              font-size: 16px;
+              /* width: 100%;
+              resize: none; */
+              /* box-shadow: 0 2px 6px rgba(17,17,17,0.06); */
+              outline: none;
+              overflow-y: auto;     /* allow internal scroll when content is large */
+              height: 48px;         /* default fixed height */
+              max-height: 200px;    /* cap the visible growth (adjust as needed) */
+              transition: height 0.15s ease;
+              
+
+            }
+
+            
+#user-input::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Edge */
+}
+
+            /* Improve placeholder */
+            #user-input::placeholder {
+              color: #9aa0a6;
+              font-weight: 500;
+            }
+
+            /* Focus state WITHOUT green outline */
+            #user-input:focus {
+              border-color: white;
+              /* box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.12); soft subtle glow */
+              outline: none;
+              box-shadow: 0 8px 30px rgba(255, 255, 255, 0.08);
+            }
+
+
+            button {
+              margin-left: 10px;
+              padding: 12px 20px;
+              border: none;
+              background: linear-gradient(135deg, #2563eb, #0ea5e9);
+              color: white;
+              font-size: 15px;
+              cursor: pointer;
+              transition: background 0.2s ease;
+            }
+
+            /* Microphone button styles */
+            .mic-button {
+              padding: 8px;
+              background-color: white;
+              border-radius: 50%;
+              /* width: 50px;
+              height: 50px; */
+              display: flex;
+              /* align-items: center; */
+              justify-content: center;
+              margin-left: 10px;
+              cursor: pointer;
+              transition: all 0.3s ease;
+            }
+
+            .mic-button.listening {
+              background-color: #dc3545;
+              animation: pulse 1.5s infinite;
+            }
+
+            .mic-button i {
+              font-size: 20px;
+              color: black;
+            }
+
+            @keyframes pulse {
+              0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+              }
+              70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+              }
+              100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+              }
+            }
+
+            .highlight-message {
+              background-color: #fff3cd;  /* light yellow */
+              color: #856404;             /* dark gold/brown text */
+              border: 1px solid #ffeeba;
+              border-radius: 8px;
+              padding: 8px 12px;
+              margin: 6px 0;
+              font-weight: bold;
+              box-shadow: 0 0 5px rgba(255, 193, 7, 0.4);
+            }
+
+           
+
+            /* Default message overlayed in center */
+            .default-message {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              color: #94a3b8;
+              font-size: 45px;
+              text-align: center;
+              font-weight: bold !important;
+              opacity: 0.7;
+              pointer-events: none; /* prevent blocking clicks */
+            }
+
+            /* Example user message styling */
+            .user-message {
+              align-self: flex-end;
+              background: #1A73E8;
+              color: white;
+              padding: 8px 12px;
+              border-radius: 12px;
+              margin: 4px 0;
+              max-width: 70%;
+            }
+
+            .hide {
+              display: none !important;
+            }
+
+            #my-button {
+              background: green; /* success green */
+              color: #fff;
+              border: none;
+              border-radius: 5px;
+              cursor: pointer;
+              font-weight: 500;
+            }
+
+            #intro-text {
+              font-size: clamp(1.75rem, 4vw, 2.75rem);
+              font-weight: 700;
+              text-align: center;
+              line-height: 1.25;
+              background: linear-gradient(90deg, #fff, #22d3ee, #3b82f6);
+              background-size: 200% auto;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+            }
+
+            @keyframes gradientShift {
+              0% { background-position: 0% center; }
+              100% { background-position: 100% center; }
+            }
+
+            .button-container {
+                display: flex;
+                flex-direction: column; /* stack items vertically */
+                align-items: center;    /* center horizontally */
+                gap: 10px;              /* even spacing */
+                margin-top: 15px;
+              }
+
+              .button-container button {
+                padding: 10px 18px;
+                font-size: 16px;
+                cursor: pointer;
+              }
+
+              .or-text {
+                font-size: 18px;
+                font-weight: bold;
+              }
+
+            .prompt-header {
+              font-size: 16px;
+              font-weight: 500;
+              margin-bottom: 8px;
+              color: #333;
+              text-align: left;
+            }
+
+            /* ========== SIDEBAR STYLES ========== */
+            /* Right Sidebar */
+            .right-sidebar {
+              position: fixed;
+              top: 0;
+              right: -400px;
+              max-width: 100vw;
+              width: 380px;
+              height: 100vh;
+              background: #141c2b;
+              box-shadow: -8px 0 32px rgba(0, 0, 0, 0.45);
+              z-index: 9999;
+              transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+              display: flex;
+              flex-direction: column;
+              border-left: 1px solid rgba(148, 163, 184, 0.12);
+            }
+
+            .right-sidebar.open {
+              right: 0;
+            }
+
+            /* Sidebar Overlay */
+            .sidebar-overlay {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(0, 0, 0, 0.5);
+              z-index: 9998;
+              opacity: 0;
+              visibility: hidden;
+              transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+
+            .sidebar-overlay.active {
+              opacity: 1;
+              visibility: visible;
+            }
+
+            /* Sidebar Header */
+            .sidebar-header {
+              padding: 20px;
+              background: #111827;
+              border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+
+            .sidebar-header h4 {
+              margin: 0;
+              color: #f1f5f9;
+              font-weight: 600;
+              font-size: 1.25rem;
+            }
+
+            .close-sidebar {
+              background: none;
+              border: none;
+              font-size: 28px;
+              color: #6c757d;
+              cursor: pointer;
+              padding: 0;
+              width: 36px;
+              height: 36px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 4px;
+              transition: all 0.2s;
+            }
+
+            .close-sidebar:hover {
+              background: #e9ecef;
+              color: #495057;
+            }
+
+            /* Sidebar Content */
+            .sidebar-content {
+              flex: 1;
+              overflow-y: auto;
+              padding: 0;
+            }
+
+            /* Sidebar List */
+            .sidebar-list {
+              list-style: none;
+              padding: 0;
+              margin: 0;
+            }
+
+            .sidebar-list-item {
+              border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+              transition: background 0.2s;
+            }
+
+            .sidebar-list-item:hover {
+              background: rgba(59, 130, 246, 0.08);
+            }
+
+            .sidebar-list-header {
+              padding: 16px 20px;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              cursor: pointer;
+              font-weight: 500;
+              color: #e2e8f0;
+              user-select: none;
+            }
+
+            .sidebar-list-header:hover {
+              background: rgba(59, 130, 246, 0.08);
+            }
+
+            .sidebar-list-header .title {
+              flex: 1;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+            }
+
+            .sidebar-list-header .icon {
+              transition: transform 0.3s ease;
+              font-size: 14px;
+              color: #6c757d;
+            }
+
+            .sidebar-list-item.expanded .icon {
+              transform: rotate(180deg);
+            }
+
+            /* Collapsible Content */
+            .sidebar-collapsible-content {
+              max-height: 0;
+              overflow: hidden;
+              transition: max-height 0.3s ease;
+              background: #111827;
+            }
+
+            .sidebar-list-item.expanded .sidebar-collapsible-content {
+              max-height: 500px;
+              /* Adjust as needed */
+            }
+
+            .sidebar-collapsible-content .content-inner {
+              padding: 16px 20px;
+              background: #0d1421;
+              border-top: 1px solid rgba(148, 163, 184, 0.12);
+            }
+
+            /* JSON Content Styling */
+            .json-content {
+              background: #0d1421;
+              border: 1px solid rgba(148, 163, 184, 0.2);
+              border-radius: 8px;
+              padding: 12px;
+              font-family: 'Courier New', monospace;
+              font-size: 13px;
+              line-height: 1.4;
+              max-height: 300px;
+              overflow-y: auto;
+              margin: 8px 0;
+              color: #e2e8f0;
+            }
+
+            .json-content pre {
+              margin: 0;
+              white-space: pre-wrap;
+              word-wrap: break-word;
+              color: #e2e8f0;
+            }
+
+            .json-key {
+              color: #f472b6;
+            }
+
+            .json-string {
+              color: #67e8f9;
+            }
+
+            .json-number {
+              color: #93c5fd;
+            }
+
+            .json-boolean {
+              color: #c4b5fd;
+            }
+
+            .json-null {
+              color: #94a3b8;
+            }
+
+            .jd-text-content {
+              font-size: 13px;
+              line-height: 1.6;
+              white-space: pre-line;
+              background: #111827;
+              color: #e2e8f0 !important;
+              padding: 12px;
+              border-radius: 8px;
+              border: 1px solid rgba(148, 163, 184, 0.2);
+              margin-top: 10px;
+              max-height: 280px;
+              overflow-y: auto;
+            }
+
+            .right-sidebar .sidebar-item-meta {
+              font-size: 12px;
+              color: #94a3b8;
+            }
+
+            .right-sidebar .sidebar-history-use-btn {
+              margin-top: 10px;
+              background: linear-gradient(135deg, #059669, #10b981);
+              color: #fff;
+              border: none;
+              border-radius: 8px;
+              padding: 6px 14px;
+              font-weight: 600;
+              font-size: 0.8rem;
+              cursor: pointer;
+            }
+
+            .right-sidebar .sidebar-history-use-btn:hover {
+              filter: brightness(1.08);
+            }
+
+
+          </style>
+
+          <div class="container-fluid mission-chat-page">
+            <div class="mission-chat-toolbar d-flex flex-wrap align-items-center justify-content-between gap-2">
+              <span class="text-sm text-muted mb-0">Mission Hire — Recruitment Assistant</span>
+              <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                <% if (permissions?.['read:any_dropdown']) { %>
+                  <select name="company_id" id="change_account" class="form-select form-select-sm account-select" required>
+                    <option value="">Select an Account</option>
+                    <% companies.forEach(company => { %>
+                      <option value="<%= company.id %>" <%= Number(selectedCompanyId) === Number(company.id) ? 'selected' : '' %>>
+                        <%= company.name %>
+                      </option>
+                    <% }) %>
+                  </select>
+                <% } %>
+                <button type="button" class="mission-history-btn" id="sidebar-toggle-btn" title="Chat history">
+                  <i class="bi bi-clock-history"></i> History
+                </button>
+              </div>
+            </div>
+            <div class="chat-wrapper">
+            <div class="chat-window" id="chat-window">
+              <div id="default-message" class="default-message">
+                <div id="intro-text">Hello! I'm Mission Hire. <br>Your Virtual AI Assistant</div>
+                <!-- <span style="font-size: 20px;">What would you like to perform today?</span> -->
+
+                <div class="button-container">
+                  <button onclick="initiateInterview()">Talk to Mission Hire</button>
+                  <!-- <span class="or-text">Or</span>
+                  <button id="my-button" onclick="browseFile()">Browse CSV File &nbsp;&nbsp;&nbsp;</button> -->
+                </div>
+              </div>
+            </div>
+            
+              <div class="input-container hide centered" id="input-section">
+              <textarea class="mx-5" id="user-input" placeholder="Enter job profile, description, or candidate info..." 
+                        onkeydown="handleEnter(event)" rows="2"></textarea>
+
+              <button id="send-button" class="hide" title="Send">Send</button>
+
+              <div class="mic-button" id="mic-button" title="Click to speak">
+                <i class="bi bi-mic"></i>
+               </div>
+            </div>
+            </div>
+          </div>
+
+            <script>
+              const chatWindow = document.getElementById('chat-window');
+              const userInput = document.getElementById('user-input');
+              const micButton = document.getElementById('mic-button');
+              const sendButton = document.getElementById('send-button');
+
+              // Speech recognition setup
+              const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+              let recognition = null;
+              let isListening = false;
+
+              if (SpeechRecognition) {
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                  isListening = true;
+                  micButton.classList.add('listening');
+                  appendMessage("Listening... Speak now", 'bot-message');
+                };
+
+                recognition.onresult = function(event) {
+                  const transcript = Array.from(event.results)
+                    .map(result => result[0])
+                    .map(result => result.transcript)
+                    .join('');
+
+                  userInput.value = transcript;
+
+                  if (event.results[0].isFinal) {
+                    setTimeout(() => {
+                      sendMessage();
+                    }, 1000);
+                  }
+                };
+
+                recognition.onerror = function(event) {
+                  console.error('Speech recognition error:', event.error);
+                  appendMessage(`Speech recognition error: ${event.error}`, 'bot-message');
+                  stopListening();
+                };
+
+                recognition.onend = function() {
+                  stopListening();
+                };
+              } else {
+                console.warn('Speech recognition not supported in this browser');
+                micButton.style.display = 'none';
+              }
+
+              function startListening() {
+                if (recognition && !isListening) {
+                  try {
+                    recognition.start();
+                  } catch (error) {
+                    console.error('Error starting speech recognition:', error);
+                  }
+                }
+              }
+
+              function stopListening() {
+                if (recognition && isListening) {
+                  recognition.stop();
+                  isListening = false;
+                  micButton.classList.remove('listening');
+                }
+              }
+
+              // Event listeners
+              micButton.addEventListener('click', function() {
+                if (isListening) {
+                  stopListening();
+                } else {
+                  startListening();
+                }
+              });
+
+              sendButton.addEventListener('click', sendMessage);
+
+              /* -------------------------
+              clientId helper (persistent)
+              ------------------------- */
+              function getClientId() {
+                let id = localStorage.getItem('mission_client_id');
+                if (!id) {
+                  id = 'client-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+                  localStorage.setItem('mission_client_id', id);
+                }
+                return id;
+              }
+
+              /* -------------------------
+                Updated sendMessage()
+                - Always sends messages to /webhook/chat
+                - Removes the old direct /chat/confirm calls
+                ------------------------- */
+              async function sendMessage() {
+                const defaultMessage = document.getElementById("default-message");
+                const message = userInput.value.trim();
+                if (message === '') return;
+
+                if (defaultMessage) defaultMessage.remove();
+
+                appendMessage(message, 'user-message');
+                userInput.value = '';
+                userInput.style.height = '48px';
+
+                const clientId = getClientId();
+
+                // Typing indicator
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'bold-message';
+
+                const thinkingTexts = [
+                  "Thinking...",
+                  "Analyzing the request...",
+                  "Generating the output..."
+                ];
+
+                let index = 0;
+                let dotCount = 0;
+
+                typingDiv.textContent = thinkingTexts[index];
+                
+                const interval = setInterval(() => {
+                  dotCount = (dotCount + 1) % 4; // cycles 0..3 dots
+                  typingDiv.textContent = thinkingTexts[index] + ".".repeat(dotCount);
+
+                  if (dotCount === 3) {
+                    if (index < thinkingTexts.length - 1) {
+                      index++; // move to next text
+                    } else {
+                      // Stop at the last text
+                      clearInterval(interval);
+                    }
+                  }
+
+                  chatWindow.scrollTop = chatWindow.scrollHeight;
+                }, 500);
+
+                chatWindow.appendChild(typingDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+
+                try {
+                  const response = await fetch('/webhook/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message, clientId })
+                  });
+
+                  const data = await response.json();
+                  chatWindow.removeChild(typingDiv);
+
+                  if (data.reply) {
+                    appendMessage(data.reply, 'bot-message');
+                  }
+
+                  if (data.questions && data.questions.length > 0) {
+                  console.log(data);
+                  
+                  const candidateEmail = data.email;
+                  let isPrateekEmail = false;
+                  
+                  if (candidateEmail) {
+                      if (Array.isArray(candidateEmail)) {
+                          // Handle array format: check if any email matches prateek@techarchitect.com
+                          isPrateekEmail = candidateEmail.some(email => email === 'prateek@techarchitect.com');
+                      } else {
+                          // Handle string format
+                          isPrateekEmail = candidateEmail === 'prateek@techarchitect.com';
+                      }
+                  }
+                  
+                  console.log("Email check:", { candidateEmail, isPrateekEmail });
+                  
+                  let displayQuestions;
+                  
+                  if (isPrateekEmail) {
+                      // For Prateek, show only 3 questions
+                      displayQuestions = data.questions.slice(0, 3);
+                      console.log(`🎯 Showing ${displayQuestions.length} questions for Prateek`);
+                  } else {
+                      // For non-Prateek, show all questions (since backend already has the full list)
+                      displayQuestions = data.questions;
+                      console.log(`👤 Showing ${displayQuestions.length} questions for non-Prateek user`);
+                  }
+
+                  // Display the selected questions
+                  displayQuestions.forEach((q, i) => {
+                      appendMessage(`${i + 1}. ${q}`, 'bot-message');
+                  });
+
+                  // Prompt user to confirm
+                  setTimeout(() => {
+                      appendMessage("Do you want to proceed with these questions? Type 'Yes' to confirm or 'No' to cancel.", 'bot-message highlight-message');
+                  }, 300);
+              }
+
+                  // Show call results (if any)
+                  if (data.callResults && data.callResults.length > 0) {
+                    setTimeout(() => {
+                      data.callResults.forEach(r => appendMessage(r, 'bot-message'));
+                    }, 600);
+                  }
+
+                } catch (error) {
+                  chatWindow.removeChild(typingDiv);
+                  appendMessage('Something went wrong. Please try again.', 'bot-message');
+                }
+              }
+
+              function handleEnter(event) {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  sendMessage();
+                }
+              }
+
+              const textarea = document.getElementById("user-input");
+              if (textarea) {
+                textarea.addEventListener("input", () => {
+                  textarea.style.height = "auto";
+                  textarea.style.height = textarea.scrollHeight + "px";
+                });
+              }
+
+              function appendMessage(text, className) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${className}`;
+                messageDiv.textContent = text;
+                chatWindow.appendChild(messageDiv);
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+              }
+
+              document.addEventListener("DOMContentLoaded", () => {
+                const clientId = getClientId();
+                fetch("/webhook/reset", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({clientId })
+                })
+                  .then(res => res.json())
+                  .then(data => {
+                    console.log("Chat session reset:", data);
+                  })
+                  .catch(err => console.error("Reset failed:", err));
+              });
+
+              function initiateInterview()
+              {
+                showHideTextArea();
+              }
+
+              function showHideTextArea() {
+          const inputSection = document.getElementById("input-section");
+          const defaultMessage = document.getElementById("default-message");
+          const textareaEl = document.getElementById("user-input");
+          const chatWindow = document.getElementById("chat-window");
+
+          const textarea = document.getElementById("user-input");
+          
+  
+        if (textarea) {
+          textarea.addEventListener("input", () => {
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
+            // textarea.style.border = "0.5px rgb(226 221 221)";
+            // textarea.style.borderRadius = "21px";                 // rounded corners
+            // textarea.style.boxShadow = "0 6px 18px rgba(0,0,0,0.06)"; // soft shadow
+            // textarea.style.transition = "border 150ms ease, box-shadow 150ms ease, border-radius 150ms ease";
+            // micButton.style.display = 'none';
+            if (inputSection.classList.contains("centered")) {
+                inputSection.style.height = "auto";  // Let it grow
+                inputSection.classList.add("rectangle");
+            }
+
+            
+          });
+          
+        }
+
+  if (inputSection.classList.contains("hide")) {
+    // Remove default hero text
+    if (defaultMessage) defaultMessage.remove();
+
+    // Show input and put in centered mode
+    inputSection.classList.remove("hide");
+    inputSection.classList.remove("bottom");
+    inputSection.classList.add("centered");
+
+    // ensure chat window doesn't have bottom padding yet
+    // chatWindow.classList.remove("with-input");
+
+    // focus the textarea so user can start typing
+    setTimeout(() => textareaEl.focus(), 120);
+
+    // add Mission intro message (only once)
+    appendMessage(
+      `How can I assist you today? 
+`,
+      'bot-message-centered'
+    );
+
+    // Listen for first user input to move input down
+const moveToBottom = () => {
+  if (!inputSection.classList.contains("bottom")) {
+    inputSection.classList.remove("centered");
+    inputSection.classList.add("bottom");
+    // chatWindow.classList.add("with-input");
+    textareaEl.focus();
+    
+  }
+};
+
+// Key handling: only move when user presses Enter (or Shift+Enter)
+const onKeyForMove = (e) => {
+
+  // Shift + Enter → allow newline, DO NOT move input
+  if (e.key === "Enter" && e.shiftKey) {
+    return; 
+  }
+
+  // Enter (normal) → move down + send
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    moveToBottom();
+    sendMessage();
+    const botMsg = document.querySelector(".bot-message-centered");
+    if (botMsg) botMsg.classList.add("hide");
+    return;
+  }
+};
+
+// Attach handler
+textareaEl.addEventListener("keydown", onKeyForMove);
+
+  } else {
+    // Hide input and restore default (user toggled off)
+    inputSection.classList.add("hide");
+    inputSection.classList.remove("centered", "bottom");
+    chatWindow.classList.remove("with-input");
+  }
+}
+
+
+
+// ensure on appendMessage we scroll to bottom
+function appendMessage(text, className) {
+  const messageDiv = document.createElement('div');
+  messageDiv.className = `message ${className}`;
+  messageDiv.textContent = text;
+  chatWindow.appendChild(messageDiv);
+
+  // if input is bottom, scroll to bottom; if centered, keep messages visible above input
+  setTimeout(() => {
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+  }, 50);
+}
+
+            /* ========== SIDEBAR FUNCTIONALITY ========== */
+            // DOM Elements
+            const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+            const rightSidebar = document.getElementById('right-sidebar');
+            const closeSidebarBtn = document.getElementById('close-sidebar');
+            const sidebarOverlay = document.getElementById('sidebar-overlay');
+            const sidebarList = document.getElementById('sidebar-list');
+
+            // Function to format JSON with syntax highlighting
+            function syntaxHighlight(json) {
+              if (typeof json != 'string') {
+                json = JSON.stringify(json, null, 2);
+              }
+              json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+              return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                  if (/:$/.test(match)) {
+                    cls = 'json-key';
+                  } else {
+                    cls = 'json-string';
+                  }
+                } else if (/true|false/.test(match)) {
+                  cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                  cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+              });
+            }
+
+            function formatDate(dateStr) {
+              const d = new Date(dateStr);
+              return d.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+              });
+            }
+
+            function formatJDText(jd) {
+              if (!jd || typeof jd !== 'object') return 'No details available';
+
+              return `
+                Job Profile : ${jd.job_profile || '-'}
+                Job Description : ${jd.job_description || '-'}
+                Experience Required : ${jd.experience_required ?? '-'}
+                Number of Questions to Ask : ${jd.number_of_questions ?? '-'}
+                List of Contacts : ${(jd.list_of_contacts || []).join(', ') || '-'}
+                Name : ${(jd.candidate_name || []).join(', ') || '-'}
+                Emails : ${(jd.candidate_email || []).join(', ') || '-'}
+                `.trim();
+            }
+
+            // Function to create sidebar items
+            async function createSidebarItems() {
+              sidebarList.innerHTML = '';
+
+              try {
+                const res = await fetch('/admin/jd-history');
+                const result = await res.json();
+
+                if (!result.success || !result.data.length) {
+                  sidebarList.innerHTML = `
+                  <li class="sidebar-list-item">
+                    <div class="sidebar-list-header">
+                      <span>No JD history found (last 7 days)</span>
+                    </div>
+                  </li>`;
+                  return;
+                }
+
+                result.data.forEach((item, index) => {
+                  const li = document.createElement('li');
+                  li.className = 'sidebar-list-item';
+
+                  const header = document.createElement('div');
+                  header.className = 'sidebar-list-header';
+
+                  let experienceText = '-';
+
+                  try {
+                    const jd =
+                      typeof item.enhanced_description === 'string'
+                        ? JSON.parse(item.enhanced_description)
+                        : item.enhanced_description;
+
+                    const exp = jd?.experience_required;
+
+                    if (exp === 0 || exp === '0') {
+                      experienceText = 'Fresher';
+                    } else if (typeof exp === 'string') {
+                      const lower = exp.toLowerCase();
+
+                      if (
+                        lower.includes('fresher') ||
+                        lower.includes('no experience')
+                      ) {
+                        experienceText = 'Fresher';
+                      } else {
+                        experienceText = `${exp} - Yrs`; // e.g. "2-4"
+                      }
+                    } else if (typeof exp === 'number') {
+                      experienceText = `${exp} - Yrs`;
+                    }
+                  } catch (e) {
+                    console.warn('Experience parse failed');
+                  }
+
+                  header.innerHTML = `
+                    <div class="title" style="flex-direction: column; align-items: flex-start;">
+                      <div style="font-weight: 600;">
+                        📄 ${item.title}
+                      </div>
+                      <div class="sidebar-item-meta">
+                        Exp: ${experienceText} | ${formatDate(item.latest_created_at)}
+                      </div>
+                    </div>
+                    <span class="icon">▼</span>
+                  `;
+
+                  const contentDiv = document.createElement('div');
+                  contentDiv.className = 'sidebar-collapsible-content';
+
+                  const innerDiv = document.createElement('div');
+                  innerDiv.className = 'content-inner';
+
+                  const textDiv = document.createElement('div');
+                  textDiv.className = 'jd-text-content';
+
+                  let jdObj = {};
+                  try {
+                    jdObj =
+                      typeof item.enhanced_description === 'string'
+                        ? JSON.parse(item.enhanced_description)
+                        : item.enhanced_description;
+                  } catch (e) {
+                    console.warn('JD parse failed');
+                  }
+
+                  textDiv.innerText = formatJDText(jdObj);
+
+                  const useBtn = document.createElement('button');
+                  useBtn.type = 'button';
+                  useBtn.className = 'sidebar-history-use-btn';
+                  useBtn.textContent = 'Use';
+
+                  useBtn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent collapsing
+                    applyJsonToChat(item.enhanced_description);
+                  });
+
+                  innerDiv.appendChild(useBtn);
+
+                  innerDiv.appendChild(textDiv);
+                  contentDiv.appendChild(innerDiv);
+
+                  li.appendChild(header);
+                  li.appendChild(contentDiv);
+
+                  header.addEventListener('click', () => {
+                    const expanded = li.classList.contains('expanded');
+
+                    document.querySelectorAll('.sidebar-list-item').forEach(el => {
+                      el.classList.remove('expanded');
+                    });
+
+                    if (!expanded) {
+                      li.classList.add('expanded');
+                    }
+                  });
+
+                  sidebarList.appendChild(li);
+                });
+
+              } catch (err) {
+                console.error('Sidebar load failed', err);
+              }
+            }
+
+
+            function openSidebar() {
+              rightSidebar.classList.add('open');
+              sidebarOverlay.classList.add('active');
+              document.body.style.overflow = 'hidden';
+
+              createSidebarItems();
+            }
+
+            // Function to close sidebar
+            function closeSidebar() {
+              rightSidebar.classList.remove('open');
+              sidebarOverlay.classList.remove('active');
+              document.body.style.overflow = ''; // Restore body scroll
+
+              // Close all expanded items
+              document.querySelectorAll('.sidebar-list-item').forEach(item => {
+                item.classList.remove('expanded');
+              });
+            }
+
+            // Event listeners for sidebar
+            sidebarToggleBtn.addEventListener('click', openSidebar);
+            closeSidebarBtn.addEventListener('click', closeSidebar);
+            sidebarOverlay.addEventListener('click', closeSidebar);
+
+            // Initialize sidebar on page load
+            document.addEventListener('DOMContentLoaded', () => {
+              createSidebarItems();
+            });
+
+            // Close sidebar with Escape key
+            document.addEventListener('keydown', (e) => {
+              if (e.key === 'Escape' && rightSidebar.classList.contains('open')) {
+                closeSidebar();
+              }
+            });
+
+            function applyJsonToChat(jsonData) {
+              let data = jsonData;
+
+              if (typeof data === 'string') {
+                try {
+                  data = JSON.parse(data);
+                } catch (e) {
+                  console.error('Invalid JSON');
+                  return;
+                }
+              }
+
+              // Build formatted text
+              let formattedText = '';
+
+              if (data.job_profile) {
+                formattedText += `Job Profile : ${data.job_profile}\n`;
+              }
+
+              if (data.job_description) {
+                formattedText += `Job Description : ${data.job_description}\n`;
+              }
+
+              if (data.experience_required) {
+                formattedText += `Experience Required : ${data.experience_required}\n`;
+              }
+
+              if (data.number_of_questions) {
+                formattedText += `Number of Questions to Ask : ${data.number_of_questions}\n`;
+              }
+
+              if (data.contacts) {
+                formattedText += `List of Contacts : ${Array.isArray(data.contacts) ? data.contacts.join(', ') : data.contacts}\n`;
+              }
+
+              if (data.name) {
+                formattedText += `Name : ${data.name}\n`;
+              }
+
+              if (data.emails) {
+                formattedText += `Emails : ${Array.isArray(data.emails) ? data.emails.join(', ') : data.emails}\n`;
+              }
+
+              formattedText += `List of Contacts :\n`;
+              formattedText += `Name :\n`;
+              formattedText += `Emails :\n`;
+
+              // Show input box if hidden
+              const inputSection = document.getElementById("input-section");
+              const textarea = document.getElementById("user-input");
+
+              if (inputSection.classList.contains("hide")) {
+                inputSection.classList.remove("hide");
+                inputSection.classList.remove("centered");
+                inputSection.classList.add("bottom");
+              }
+
+              textarea.value = formattedText.trim();
+              textarea.focus();
+
+              textarea.style.height = "auto";
+              textarea.style.height = textarea.scrollHeight + "px";
+
+              closeSidebar();
+            }
+
+
+            </script>
+
+            <%- include('includes/sub-footer') %>
+      </main>
+      <%- include('includes/config') %>
+        <!--   Core JS Files   -->
+        <%- include('includes/footer') %>

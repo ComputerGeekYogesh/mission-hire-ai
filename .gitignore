@@ -1,0 +1,15 @@
+/node_modules/
+.env
+db.js
+package-lock.json
+
+# Interview uploads (snapshots / gate images)
+uploads/interview-gate/
+
+# Interview session recordings (chunks, answers, merged video)
+uploads/interview-recordings/
+
+/uploads
+
+# Whisper transcription temp files
+temp_audio_*.mp3

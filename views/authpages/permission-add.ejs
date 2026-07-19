@@ -1,0 +1,151 @@
+<%- include('includes/header') %>
+<body class="g-sidenav-show  bg-gray-100">
+    <%- include('includes/sidebar') %>
+  <main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg ">
+    <!-- Navbar -->
+    <%- include('includes/navbar') %>
+    <!-- End Navbar -->
+     <style>
+  .custom-card {
+    border: 2px solid #cce7ff !important; /* force override */
+    border-radius: 12px !important;
+    transition: 0.3s ease-in-out;
+    background: #f3f3f3a3 !important;
+  }
+  .custom-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+    transform: translateY(-3px);
+  }
+
+  .job-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000205;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  white-space: nowrap;       /* Prevents text from wrapping */
+  overflow: hidden;          /* Hides overflow text */
+  text-overflow: ellipsis;   /* Shows "..." for long text */
+}
+</style>
+
+<style>
+  /* ✅ Custom blue checkbox styling */
+  .form-check-input.custom-blue:checked {
+    background-color: #0d6efd !important; /* Bootstrap primary blue */
+    border-color: #0d6efd !important;
+  }
+
+  .form-check-input.custom-blue:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+    border-color: #0d6efd !important;
+  }
+</style>
+
+    <div class="container-fluid py-2 min-vh-100">
+      <div class="row">
+            <div class="col-12">
+                <div class="card my-4">
+                     <div class="card-header p-0 position-relative ">
+                        <div class=" border-radius-lg pt-4 pb-2 d-flex justify-content-between align-items-center">
+                            <h6 class="text-dark text-capitalize ps-3">Add Permission</h6>
+                            <a href="/admin/permission" class="btn btn-info btn-sm me-5">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      <div class="row">
+        <div class="col-12">
+<div class="card shadow-lg border-0 rounded-3">
+
+   <!-- <div class="bg-gradient-info border-radius-lg pt-4 pb-2 d-flex justify-content-between align-items-center">
+        <h6 class="text-white text-capitalize ps-3">Add Permission</h6>
+        <a href="/admin/permission" class="btn btn-primary btn-sm me-5">Back</a>
+    </div> -->
+  <div class="container mt-5 mb-5">
+    <div class="card-body p-5 ">
+      <!-- <div class="row justify-content-center">
+        <div class="col-md-8"> -->
+          <form method="POST" action="/admin/permission-add">
+            <div class="row mb-4 align-items-center">
+              <div class="col-md-3">
+                <label for="name" class="form-label mb-0 fw-semibold">Permission Type</label>
+              </div>
+              <div class="col-md-9">
+              <div class="d-flex flex-column gap-2">
+                  <% types.forEach(type => { %>
+                    <div class="form-check">
+                      <input 
+                        class="form-check-input custom-blue" 
+                        type="checkbox" 
+                        name="name[]" 
+                        id="type_<%= type %>" 
+                        value="<%= type %>"
+                        
+                      >
+                      <label class="form-check-label" for="type_<%= type %>">
+                        <%= type.toUpperCase() %>
+                      </label>
+                    </div>
+                  <% }) %>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="form-group">
+              <label class="form-label fw-semibold mb-2">Select a type</label>
+              <div class="flex flex-wrap gap-3">
+                <% types.forEach(type => { %>
+                  <label class="flex items-center space-x-2 bg-gray-50 border rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-100 transition">
+                    <input 
+                      type="checkbox" 
+                      name="name[]" 
+                      value="<%= type %>" 
+                      class="form-checkbox h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
+                    >
+                    <span class="text-gray-700 text-sm"><%= type.toUpperCase() %></span>
+                  </label>
+                <% }) %>
+              </div>
+            </div> -->
+
+             <div class="row mb-4 align-items-center">
+              <div class="col-md-3">
+                <label for="name" class="form-label mb-0 fw-semibold">Resource name</label>
+              </div>
+              <div class="col-md-9">
+                <input 
+                  type="text" 
+                  name="resource" 
+                  id="resource" 
+                  class="form-control form-control-sm outlined-input rounded-3 py-2" 
+                  placeholder="Enter Resource name" 
+                  required
+                >
+              </div>
+            </div>
+            <div class="row mb-2">
+          <div class="col-12 d-flex justify-content-center">
+            <button type="submit" class="btn btn-info btn-lg rounded-3 shadow-sm px-5">
+              Add
+            </button>
+          </div>
+        </div>
+          </form>
+        <!-- </div>
+      </div> -->
+    </div>
+  </div>
+</div>
+          </div>
+        </div>
+      </div>
+      
+      <%- include('includes/sub-footer') %>
+    </div>
+  </main>
+  <%- include('includes/config') %>
+  <!--   Core JS Files   -->
+  <%- include('includes/footer') %>
+

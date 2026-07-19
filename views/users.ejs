@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+   body {
+      background: #f5f5f5; /* Light gray background */
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+    }
+
+    .sidebar {
+      width: 220px;
+      background: #ffffff;
+      padding: 1.5rem;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    .sidebar h4 {
+      color: #0072ff;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #333;
+      padding: 10px 15px;
+      margin-bottom: 10px;
+      text-decoration: none;
+      border-radius: 8px;
+    }
+
+    .sidebar a:hover {
+      background: #f0f0f0;
+    }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 2rem;
+      flex-grow: 1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      color: #333;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .dashboard-card {
+      background: #fff;
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .logout-btn {
+      font-size: 0.9rem;
+    }
+
+    .sidebar h4 {
+    color: #232527;
+    margin-bottom: 2rem;
+}
+
+  </style>
+</head>
+<body>
+
+  <%- include('partials/sidebar') %>
+
+  <div class="main-content">
+    <%- include('partials/header') %>
+
+    <div class="dashboard-card">
+<div class="container mt-4">
+  <div class="card shadow border-0">
+    <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center mb-4">
+      <h5 class="mb-0">Users Listing</h5>
+      <input type="text" id="UsersSearch" class="form-control form-control-sm w-50" placeholder="Search jobs...">
+    </div>
+
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0" id="usersTable">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">#ID</th>
+              <th scope="col">Email</th>
+              <th scope="col">Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% users.forEach(u => { %>
+              <tr>
+                <td><%= u.id %></td>
+                <td><%= u.email %></td>
+                <td><%= u.created_at %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- </table> -->
+    </div>
+  </div>
+
+</body>
+</html>
+
+<script>
+  const searchInput = document.getElementById('UsersSearch');
+  const rows = document.querySelectorAll('#usersTable tbody tr');
+
+  searchInput.addEventListener('keyup', () => {
+    const searchTerm = searchInput.value.toLowerCase();
+
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+  });
+</script>
+
+<!-- Search Script -->
+<!-- <script>
+  const searchInput = document.getElementById('jobSearch');
+  const rows = document.querySelectorAll('#jobsTable tbody tr');
+
+  searchInput.addEventListener('keyup', () => {
+    const searchTerm = searchInput.value.toLowerCase();
+
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+  });
+</script> -->
+<!-- <script>
+  document.querySelectorAll('.candidate-filter').forEach(select => {
+    select.addEventListener('change', function () {
+      const jobId = this.getAttribute('data-job-id');
+      const candidateType = this.value;
+
+      // Example: make a GET request to fetch candidates
+      fetch(`/admin/jobs/${jobId}/candidates?type=${candidateType}`)
+        .then(res => res.json())
+        .then(data => {
+          // ✅ Handle fetched data
+          alert(`Fetched ${data.length} ${candidateType} candidates for job ID ${jobId}`);
+          console.log(data);
+          // You can render a modal, or table, or redirect as needed
+        })
+        .catch(err => {
+          console.error('Error fetching candidates:', err);
+        });
+    });
+  });
+</script> -->
+
+<script>
+  // Candidate job redirects removed with Job List module
+</script>

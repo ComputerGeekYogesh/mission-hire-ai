@@ -1,0 +1,38 @@
+<% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+<nav aria-label="Page navigation" class="mt-4 mission-list-pagination">
+  <ul class="pagination pagination-sm justify-content-center flex-wrap mb-0 gap-1">
+    <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+      <a class="page-link mission-page-nav-btn" href="<%= currentPage <= 1 ? '#' : '?page=1' %>" aria-label="First page">&laquo;</a>
+    </li>
+    <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+      <a class="page-link mission-page-nav-btn" href="<%= currentPage <= 1 ? '#' : '?page=' + (currentPage - 1) %>" aria-label="Previous page">&lsaquo;</a>
+    </li>
+    <% if (pageRange && pageRange.showFirst) { %>
+      <li class="page-item"><a class="page-link" href="?page=1">1</a></li>
+      <% if (pageRange.showFirstEllipsis) { %>
+        <li class="page-item disabled" aria-hidden="true"><span class="page-link mission-page-ellipsis">&hellip;</span></li>
+      <% } %>
+    <% } %>
+    <% (pageRange && pageRange.pages ? pageRange.pages : []).forEach(function (i) { %>
+      <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+      </li>
+    <% }) %>
+    <% if (pageRange && pageRange.showLast) { %>
+      <% if (pageRange.showLastEllipsis) { %>
+        <li class="page-item disabled" aria-hidden="true"><span class="page-link mission-page-ellipsis">&hellip;</span></li>
+      <% } %>
+      <li class="page-item"><a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a></li>
+    <% } %>
+    <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+      <a class="page-link mission-page-nav-btn" href="<%= currentPage >= totalPages ? '#' : '?page=' + (currentPage + 1) %>" aria-label="Next page">&rsaquo;</a>
+    </li>
+    <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+      <a class="page-link mission-page-nav-btn" href="<%= currentPage >= totalPages ? '#' : '?page=' + totalPages %>" aria-label="Last page">&raquo;</a>
+    </li>
+  </ul>
+  <p class="text-center text-muted text-sm mt-2 mb-0">
+    Page <strong><%= currentPage %></strong> of <strong><%= totalPages %></strong>
+  </p>
+</nav>
+<% } %>

@@ -1,0 +1,44 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="/modules/candidate-interview/css/admin-ui.css?v=2" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4 interview-admin-wrap">
+    <header class="im-page-header">
+      <p class="im-eyebrow">Interview Management</p>
+      <h1 class="im-page-title">Interview Analytics</h1>
+      <p class="im-page-sub">Distribution of interviews by type and status.</p>
+    </header>
+    <%- include('_nav') %>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="im-panel-card mb-3">
+          <div class="card-header">By Interview Type</div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <% Object.keys(byType).forEach(function(k) { %>
+              <li class="list-group-item d-flex justify-content-between"><span><%= k %></span><strong><%= byType[k] %></strong></li>
+              <% }) %>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="im-panel-card mb-3">
+          <div class="card-header">By Status</div>
+          <div class="card-body">
+            <ul class="list-group list-group-flush">
+              <% Object.keys(byStatus).forEach(function(k) { %>
+              <li class="list-group-item d-flex justify-content-between"><span><%= k %></span><strong><%= byStatus[k] %></strong></li>
+              <% }) %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="text-muted text-sm">Avg duration: <%= stats.avg_duration_seconds ? Math.round(stats.avg_duration_seconds/60)+' min' : 'N/A' %></p>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

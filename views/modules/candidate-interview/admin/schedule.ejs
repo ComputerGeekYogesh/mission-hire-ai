@@ -1,0 +1,55 @@
+<%- include('../../../authpages/includes/header') %>
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative max-height-vh-100 h-100 border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+  <div class="container-fluid py-4">
+    <h4>Schedule Interview (Classic Form)</h4>
+    <p class="text-sm text-muted"><a href="/admin/interviews/schedule">Use Mission-style chat scheduler</a> (recommended)</p>
+    <%- include('_nav') %>
+    <% if (error_msg && error_msg.length) { %><div class="alert alert-danger"><%= error_msg %></div><% } %>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <form method="post" action="/admin/interviews/schedule-form">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">Candidate name *</label><input name="candidate_name" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Email *</label><input type="email" name="candidate_email" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Phone</label><input name="candidate_phone" class="form-control" placeholder="Required for voice/AI call">
+            <div class="col-md-6">
+              <label class="form-label">Job</label>
+              <select name="job_id" class="form-select">
+                <option value="">— Select job —</option>
+                <% jobs.forEach(function(j) { %>
+                <option value="<%= j.id %>"><%= j.title || j.job_id %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Job title (override)</label><input name="job_title" class="form-control"></div>
+            <div class="col-md-6">
+              <label class="form-label">Interview type *</label>
+              <select name="interview_type" class="form-select" required>
+                <option value="browser_video">Browser Video Interview</option>
+                <option value="voice_call">Voice Call</option>
+                <option value="ai_interview">AI Interview</option>
+              </select>
+            </div>
+            <div class="col-md-6"><label class="form-label">Scheduled at *</label><input type="datetime-local" name="scheduled_at" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">Timezone</label><input name="timezone" class="form-control" value="Asia/Kolkata"></div>
+            <div class="col-md-6">
+              <label class="form-label">Number of questions (optional)</label>
+              <input type="number" name="question_count" class="form-control" min="3" max="15" placeholder="Auto from job / description (default 5)">
+              <small class="text-muted">Leave blank to use job questions or parse "ask N questions" from job description.</small>
+            </div>
+            <div class="col-12"><label class="form-label">Notes</label><textarea name="notes" class="form-control" rows="2"></textarea></div>
+            <div class="col-12">
+              <label class="form-check"><input type="checkbox" name="send_invite" value="true" checked> Send email invite immediately</label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3">Schedule &amp; Generate Link</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+</body>

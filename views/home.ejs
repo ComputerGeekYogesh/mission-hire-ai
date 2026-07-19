@@ -1,0 +1,1191 @@
+<%- include('partials/header') %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #14121B;
+    --bg-deep: #0E0C14;
+    --surface: #1E1B29;
+    --surface-2: #26222F;
+    --border: #332E42;
+    --border-soft: #26222F;
+    --gold: #D4A24E;
+    --gold-dim: #8C6E38;
+    --periwinkle: #7C90F0;
+    --periwinkle-dim: #4C5390;
+    --ink: #F3EFE7;
+    --ink-muted: #A69FB3;
+    --ink-faint: #736C82;
+  }
+
+  body.bg-gray-200,
+  body {
+    margin: 0 !important;
+    background: var(--bg-deep) !important;
+    font-family: 'Inter', sans-serif !important;
+    color: var(--ink) !important;
+    scroll-behavior: smooth;
+  }
+
+  .container.position-sticky { display: none; }
+
+  .mh-landing {
+    position: relative;
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 82% 8%, rgba(124,144,240,0.10), transparent 45%),
+      radial-gradient(circle at 12% 85%, rgba(212,162,78,0.08), transparent 40%),
+      var(--bg);
+  }
+
+  #mh-bg-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .55;
+  }
+
+  .mh-wrap {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 48px 72px 56px;
+  }
+
+  /* Brand */
+  .mh-brand {
+    text-align: right;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: .32em;
+    font-size: 12px;
+    color: var(--ink-muted);
+    margin-bottom: 48px;
+  }
+
+  .mh-brand b {
+    display: block;
+    font-size: 20px;
+    letter-spacing: .28em;
+    color: var(--gold);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* Hero */
+  .mh-hero {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: 56px;
+    align-items: start;
+    min-height: calc(100vh - 160px);
+    padding-bottom: 40px;
+  }
+
+  .mh-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .14em;
+    color: var(--periwinkle);
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+
+  .mh-eyebrow::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--periwinkle);
+    box-shadow: 0 0 0 3px rgba(124,144,240,.18);
+  }
+
+  .mh-hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 52px;
+    line-height: 1.12;
+    letter-spacing: -.01em;
+    margin: 0 0 26px;
+    color: var(--ink);
+  }
+
+  .mh-hero h1 em {
+    font-style: italic;
+    font-weight: 500;
+    color: var(--gold);
+  }
+
+  .mh-typewriter-active::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 0.82em;
+    margin-left: 3px;
+    vertical-align: -0.06em;
+    background: var(--gold);
+    animation: mh-typewriter-blink 0.75s step-end infinite;
+  }
+
+  @keyframes mh-typewriter-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .mh-lede {
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--ink-muted);
+    max-width: 520px;
+    margin: 0 0 34px;
+  }
+
+  .mh-lede strong { color: var(--ink); font-weight: 600; }
+
+  .mh-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 38px;
+  }
+
+  .mh-tags span {
+    font-size: 12.5px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--ink-muted);
+    letter-spacing: .02em;
+  }
+
+  .mh-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 52px;
+  }
+
+  .mh-btn-primary {
+    background: var(--gold);
+    color: #241B08;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    padding: 14px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: .01em;
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+
+  .mh-btn-primary:hover {
+    opacity: .92;
+    transform: translateY(-1px);
+    color: #241B08;
+  }
+
+  .mh-btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    font-family: 'Inter', sans-serif;
+    font-weight: 500;
+    font-size: 14.5px;
+    padding: 14px 26px;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: border-color .2s ease, background .2s ease;
+  }
+
+  .mh-btn-secondary:hover {
+    border-color: var(--periwinkle-dim);
+    background: rgba(124,144,240,.06);
+    color: var(--ink);
+  }
+
+  .mh-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 44px;
+    border-top: 1px solid var(--border-soft);
+    padding-top: 28px;
+  }
+
+  .mh-stat .num {
+    font-family: 'Fraunces', serif;
+    font-size: 26px;
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .mh-stat .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-top: 4px;
+  }
+
+  /* Interview panel */
+  .mh-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 26px 26px 24px;
+  }
+
+  .mh-panel-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .mh-panel-top .live {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .1em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+
+  .mh-panel-top .cand {
+    font-family: 'Fraunces', serif;
+    font-size: 19px;
+    color: var(--ink);
+    margin-top: 4px;
+  }
+
+  .mh-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: .08em;
+    color: var(--periwinkle);
+    border: 1px solid var(--periwinkle-dim);
+    background: rgba(124,144,240,.08);
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+
+  .mh-waveform {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 44px;
+    margin-bottom: 22px;
+  }
+
+  .mh-waveform i {
+    flex: 1;
+    background: linear-gradient(180deg, var(--periwinkle), var(--gold));
+    border-radius: 2px;
+    opacity: .85;
+    animation: mh-bounce 1.4s ease-in-out infinite;
+  }
+
+  @keyframes mh-bounce {
+    0%, 100% { transform: scaleY(.3); }
+    50% { transform: scaleY(1); }
+  }
+
+  .mh-bubble {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 15px 16px;
+    margin-bottom: 14px;
+    background: var(--surface-2);
+  }
+
+  .mh-bubble .who {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--periwinkle);
+    margin-bottom: 8px;
+  }
+
+  .mh-bubble.cand .who { color: var(--gold); }
+
+  .mh-bubble p {
+    margin: 0;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-muted);
+  }
+
+  .mh-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin: 20px 0 16px;
+  }
+
+  .mh-meta .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+
+  .mh-meta .role {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--ink);
+  }
+
+  .mh-meta .score {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: var(--gold);
+    text-align: right;
+  }
+
+  .mh-track {
+    height: 5px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .mh-track i {
+    display: block;
+    height: 100%;
+    width: 78%;
+    background: linear-gradient(90deg, var(--periwinkle), var(--gold));
+  }
+
+  .mh-foot {
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+
+  /* Sections */
+  .mh-section {
+    position: relative;
+    z-index: 1;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 72px;
+    border-top: 1px solid var(--border-soft);
+  }
+
+  .mh-section-head {
+    margin-bottom: 40px;
+    max-width: 640px;
+  }
+
+  .mh-section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--periwinkle);
+    margin-bottom: 12px;
+  }
+
+  .mh-section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 14px;
+    line-height: 1.2;
+  }
+
+  .mh-section-title em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .mh-section-sub {
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--ink-muted);
+    margin: 0;
+  }
+
+  .mh-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .mh-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .mh-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    height: 100%;
+    transition: border-color .2s ease, transform .2s ease;
+  }
+
+  .mh-card:hover {
+    border-color: var(--periwinkle-dim);
+    transform: translateY(-3px);
+  }
+
+  .mh-card h5 {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 10px;
+  }
+
+  .mh-card p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-muted);
+    margin: 0;
+  }
+
+  .mh-feature-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+  }
+
+  .mh-feature-list li {
+    position: relative;
+    padding: 8px 0 8px 18px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--ink-muted);
+    border-bottom: 1px solid var(--border-soft);
+  }
+
+  .mh-feature-list li:last-child { border-bottom: none; }
+
+  .mh-feature-list li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 12px;
+  }
+
+  .mh-link {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .06em;
+    color: var(--periwinkle);
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .mh-link:hover { color: var(--gold); }
+
+  /* Flow steps */
+  .mh-flow {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mh-flow-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .mh-flow-index {
+    flex-shrink: 0;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--gold-dim);
+    background: rgba(212,162,78,.1);
+    color: var(--gold);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mh-flow-step h6 {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    margin: 0 0 4px;
+  }
+
+  .mh-flow-step p {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-muted);
+    margin: 0;
+  }
+
+  .mh-flow-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 16px;
+  }
+
+  /* Industry slider */
+  .mh-slider-wrap {
+    position: relative;
+    padding: 0 52px;
+  }
+
+  .mh-slider {
+    display: flex;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 20px;
+    padding: 8px 0;
+    scrollbar-width: none;
+  }
+
+  .mh-slider::-webkit-scrollbar { display: none; }
+
+  .mh-industry-card {
+    min-width: 320px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    transition: border-color .2s ease, transform .2s ease;
+  }
+
+  .mh-industry-card:hover {
+    border-color: var(--periwinkle-dim);
+    transform: translateY(-4px);
+  }
+
+  .mh-industry-card .icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+  }
+
+  .mh-industry-card h4 {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0 0 16px;
+  }
+
+  .mh-slider-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--ink-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color .2s ease, color .2s ease;
+    z-index: 2;
+  }
+
+  .mh-slider-nav:hover {
+    border-color: var(--periwinkle);
+    color: var(--periwinkle);
+  }
+
+  .mh-slider-nav.prev { left: 0; }
+  .mh-slider-nav.next { right: 0; }
+
+  .mh-slider-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 28px;
+  }
+
+  .mh-slider-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background: var(--border);
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+
+  .mh-slider-dot.active {
+    width: 28px;
+    border-radius: 4px;
+    background: var(--gold);
+  }
+
+  /* CTA footer */
+  .mh-cta-section {
+    border-top: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, transparent, rgba(124,144,240,.04));
+  }
+
+  .mh-cta-grid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .mh-cta-note {
+    font-size: 12px;
+    color: var(--ink-faint);
+    margin-top: 10px;
+  }
+
+  .mh-reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+
+  .mh-reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @media (max-width: 1100px) {
+    .mh-hero { grid-template-columns: 1fr; gap: 40px; min-height: auto; }
+    .mh-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .mh-grid-2 { grid-template-columns: 1fr; gap: 32px; }
+  }
+
+  @media (max-width: 768px) {
+    .mh-wrap, .mh-section { padding: 32px 24px; }
+    .mh-hero h1 { font-size: 36px; }
+    .mh-section-title { font-size: 28px; }
+    .mh-grid-4 { grid-template-columns: 1fr; }
+    .mh-stats { gap: 28px; }
+    .mh-slider-wrap { padding: 0 44px; }
+    .mh-industry-card { min-width: 280px; }
+    .mh-brand { text-align: center; }
+  }
+</style>
+
+<main class="mh-landing">
+  <canvas id="mh-bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- HERO -->
+  <div class="mh-wrap">
+    <div class="mh-brand" aria-label="Mission Hire">MISSION<b>HIRE</b></div>
+
+    <div class="mh-hero">
+      <div>
+        <div class="mh-eyebrow">AI video interview assistant</div>
+        <h1 id="mh-hero-typewriter" class="mh-typewriter" aria-label="Screen candidates at the speed of conviction."></h1>
+        <p class="mh-lede">Mission Hire runs role-specific video interviews, scores every answer, and shortlists candidates automatically — giving your team <strong>consistent, unbiased calls</strong> at a volume no HR desk could match alone.</p>
+
+        <div class="mh-tags">
+          <span>High-volume recruitment</span>
+          <span>Technical &amp; engineering</span>
+          <span>Sales &amp; business development</span>
+          <span>Healthcare &amp; nursing</span>
+          <span>Remote &amp; global hiring</span>
+          <span>Campus &amp; fresher hiring</span>
+          <span>BPO &amp; contact centers</span>
+          <span>Retail &amp; hospitality</span>
+        </div>
+
+        <div class="mh-ctas">
+          <a href="/login" class="mh-btn-primary">Log in</a>
+          <!-- <a href="#contact" class="mh-btn-secondary">Request a demo</a> -->
+        </div>
+
+        <div class="mh-stats">
+          <div class="mh-stat">
+            <div class="num">60–80%</div>
+            <div class="label">Reduction in screening time</div>
+          </div>
+          <div class="mh-stat">
+            <div class="num">1000+</div>
+            <div class="label">Automated interviews / day</div>
+          </div>
+          <div class="mh-stat">
+            <div class="num">↓ Drastic</div>
+            <div class="label">Human bias in evaluation</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mh-panel">
+        <div class="mh-panel-top">
+          <div>
+            <div class="live">Live AI interview</div>
+            <div class="cand">Candidate #784231</div>
+          </div>
+          <span class="mh-badge">In progress</span>
+        </div>
+
+        <div class="mh-waveform" id="wave"></div>
+
+        <div class="mh-bubble">
+          <div class="who">Mission Hire · AI interviewer</div>
+          <p>Can you walk me through a time you handled a high-volume hiring requirement for a critical role?</p>
+        </div>
+        <div class="mh-bubble cand">
+          <div class="who">Candidate</div>
+          <p>In my previous role, I managed a campus hiring drive for 200+ positions across 3 locations…</p>
+        </div>
+
+        <div class="mh-meta">
+          <div>
+            <div class="k">Role</div>
+            <div class="role">Senior talent acquisition specialist</div>
+          </div>
+          <div>
+            <div class="k">AI score</div>
+            <div class="score">4 / 10</div>
+          </div>
+        </div>
+
+        <div class="mh-track"><i></i></div>
+        <div class="mh-foot">Conversation recorded · full transcript &amp; scoring report available in dashboard.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROBLEM -->
+  <section id="problem" class="mh-section mh-reveal">
+    <div class="mh-section-head">
+      <div class="mh-section-label">The challenge</div>
+      <h2 class="mh-section-title">Traditional hiring <em>breaks</em> at scale.</h2>
+      <p class="mh-section-sub">Manual, time-consuming, and non-analytical hiring creates bottlenecks and burnout.</p>
+    </div>
+    <div class="mh-grid-4">
+      <div class="mh-card">
+        <h5>HR burnout</h5>
+        <p>Repetitive screening, rescheduling, and follow-ups drain valuable time and energy.</p>
+      </div>
+      <div class="mh-card">
+        <h5>High volume chaos</h5>
+        <p>Large applicant volumes with no structured, scalable way to screen them efficiently.</p>
+      </div>
+      <div class="mh-card">
+        <h5>Slow decisions</h5>
+        <p>Lack of real-time analytics and structured insights delays hiring decisions.</p>
+      </div>
+      <div class="mh-card">
+        <h5>Inconsistent interviews</h5>
+        <p>Different interviewers, different questions, and no unified scoring standard.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section id="solution" class="mh-section mh-reveal">
+    <div class="mh-grid-2">
+      <div>
+        <div class="mh-section-label">The solution</div>
+        <h2 class="mh-section-title">AI-first, <em>video-driven</em> hiring.</h2>
+        <p class="mh-section-sub">An AI agent that invites candidates to video interviews, assesses them, records their responses, and scores them — all aligned to your job description and role requirements.</p>
+        <ul class="mh-feature-list">
+          <li>Real-time analytics across recruitment campaigns</li>
+          <li>Dynamic, role-specific interview questions generated by AI</li>
+          <li>Zero manual intervention from outreach to evaluation</li>
+          <li>Structured, customizable hiring pipelines</li>
+          <li>Evaluation &amp; shortlisting with detailed performance reports</li>
+        </ul>
+        <a href="#industries" class="mh-link">See use cases ↓</a>
+      </div>
+      <div class="mh-card">
+        <div class="mh-flow-label">Recruitment flow snapshot</div>
+        <div class="mh-flow">
+          <div class="mh-flow-step">
+            <span class="mh-flow-index">1</span>
+            <div>
+              <h6>Team enters job details</h6>
+              <p>Job title, skills, experience, and JD uploaded in seconds.</p>
+            </div>
+          </div>
+          <div class="mh-flow-step">
+            <span class="mh-flow-index">2</span>
+            <div>
+              <h6>AI creates interview questions</h6>
+              <p>Role-specific, structured questions tailored to the JD.</p>
+            </div>
+          </div>
+          <div class="mh-flow-step">
+            <span class="mh-flow-index">3</span>
+            <div>
+              <h6>Automated candidate outreach</h6>
+              <p>System invites candidates and triggers the AI video interview.</p>
+            </div>
+          </div>
+          <div class="mh-flow-step">
+            <span class="mh-flow-index">4</span>
+            <div>
+              <h6>Responses recorded &amp; scored</h6>
+              <p>Every question and answer is recorded, transcribed, and analyzed.</p>
+            </div>
+          </div>
+          <div class="mh-flow-step">
+            <span class="mh-flow-index">5</span>
+            <div>
+              <h6>HR receives complete insights</h6>
+              <p>AI score, interview history, and performance report in a single view.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USE CASES -->
+  <section id="industries" class="mh-section mh-reveal">
+    <div class="mh-section-head">
+      <div class="mh-section-label">Use cases</div>
+      <h2 class="mh-section-title">What can Mission Hire <em>do?</em></h2>
+      <p class="mh-section-sub">Accelerate hiring across industries with AI-powered video interviews that screen, assess, and shortlist candidates at scale.</p>
+    </div>
+
+    <div class="mh-slider-wrap">
+      <button class="mh-slider-nav prev" id="prevSlide" aria-label="Previous">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <div class="mh-slider" id="industrySlider">
+        <div class="mh-industry-card">
+          <div class="icon">📈</div>
+          <h4>High-volume recruitment</h4>
+          <ul class="mh-feature-list">
+            <li>Bulk screening for mass hiring drives</li>
+            <li>Parallel video interviews at scale</li>
+            <li>Automated shortlisting by AI score</li>
+            <li>Real-time pipeline visibility for recruiters</li>
+          </ul>
+        </div>
+        <div class="mh-industry-card">
+          <div class="icon">💻</div>
+          <h4>Technical &amp; engineering</h4>
+          <ul class="mh-feature-list">
+            <li>Problem-solving and system design questions</li>
+            <li>Code explanation and technical depth assessment</li>
+            <li>Role-specific skill evaluation via video</li>
+            <li>Structured scoring against job requirements</li>
+          </ul>
+        </div>
+        <div class="mh-industry-card">
+          <div class="icon">💼</div>
+          <h4>Sales &amp; business development</h4>
+          <ul class="mh-feature-list">
+            <li>Communication and pitch delivery assessment</li>
+            <li>Objection handling and persuasion evaluation</li>
+            <li>Confidence, clarity, and presence scoring</li>
+            <li>Automated screening before human interviews</li>
+          </ul>
+        </div>
+        <div class="mh-industry-card">
+          <div class="icon">🎧</div>
+          <h4>Customer success &amp; support</h4>
+          <ul class="mh-feature-list">
+            <li>Empathy and problem-resolution assessment</li>
+            <li>Language fluency and tone evaluation</li>
+            <li>Scenario-based customer interaction questions</li>
+            <li>Consistent scoring across all applicants</li>
+          </ul>
+        </div>
+        <div class="mh-industry-card">
+          <div class="icon">🏥</div>
+          <h4>Healthcare &amp; nursing</h4>
+          <ul class="mh-feature-list">
+            <li>Clinical knowledge and protocol questions</li>
+            <li>Patient communication and bedside manner assessment</li>
+            <li>Compliance and safety awareness screening</li>
+            <li>Recorded interviews for credential review</li>
+          </ul>
+        </div>
+        <div class="mh-industry-card">
+          <div class="icon">🌍</div>
+          <h4>Remote &amp; global hiring</h4>
+          <ul class="mh-feature-list">
+            <li>Async video interviews across time zones</li>
+            <li>Self-scheduled candidate sessions</li>
+            <li>Multi-language interview support</li>
+            <li>Standardized evaluation for distributed teams</li>
+          </ul>
+        </div>
+        <div class="mh-industry-card">
+          <div class="icon">🎓</div>
+          <h4>Campus &amp; fresher hiring</h4>
+          <ul class="mh-feature-list">
+            <li>Large-scale campus drive screening</li>
+            <li>Aptitude and behavioral question sets</li>
+            <li>Graduate potential and culture-fit assessment</li>
+            <li>Rapid shortlisting for final-round panels</li>
+          </ul>
+        </div>
+        <div class="mh-industry-card">
+          <div class="icon">📞</div>
+          <h4>BPO &amp; contact centers</h4>
+          <ul class="mh-feature-list">
+            <li>Language proficiency and accent clarity checks</li>
+            <li>Call-handling simulation via video</li>
+            <li>High-volume agent screening at scale</li>
+            <li>Shift readiness and soft-skills evaluation</li>
+          </ul>
+        </div>
+      </div>
+
+      <button class="mh-slider-nav next" id="nextSlide" aria-label="Next">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+    </div>
+    <div class="mh-slider-dots" id="sliderDots"></div>
+  </section>
+
+  <!-- CONTACT CTA -->
+  <section id="contact" class="mh-section mh-cta-section mh-reveal">
+    <div class="mh-cta-grid">
+      <div>
+        <div class="mh-section-label">Get started</div>
+        <h2 class="mh-section-title" style="margin-bottom:10px;">Ready to see Mission Hire <em>in action?</em></h2>
+        <p class="mh-section-sub">Plug in your job description, set a campaign live, and watch AI handle interviews at scale.</p>
+      </div>
+      <div style="text-align:right;">
+        <a href="/login" class="mh-btn-primary">Get started now</a>
+        <p class="mh-cta-note">Already a customer? Use your email to login and launch a new campaign.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<%- include('partials/footer') %>
+
+<script>
+  // Animated network background
+  (function() {
+    const canvas = document.getElementById('mh-bg-canvas');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    let width = 0;
+    let height = 0;
+    const PARTICLE_COUNT = 70;
+    const LINK_DISTANCE = 150;
+    const particles = [];
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    class Particle {
+      constructor() {
+        this.reset(true);
+      }
+      reset(initial) {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+        this.r = 1.4 + Math.random() * 1.6;
+      }
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(124, 144, 240, 0.85)';
+        ctx.fill();
+      }
+    }
+
+    resize();
+    window.addEventListener('resize', () => {
+      resize();
+      particles.length = 0;
+      for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+    });
+
+    for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle());
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, width, height);
+
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < LINK_DISTANCE) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(76, 83, 144, ' + ((1 - dist / LINK_DISTANCE) * 0.45) + ')';
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    animate();
+  })();
+
+  // Waveform bars
+  (function() {
+    const wave = document.getElementById('wave');
+    if (!wave) return;
+    for (let i = 0; i < 28; i++) {
+      const bar = document.createElement('i');
+      bar.style.animationDelay = (Math.random() * 1.2) + 's';
+      bar.style.height = (20 + Math.random() * 24) + 'px';
+      wave.appendChild(bar);
+    }
+  })();
+
+  // Scroll reveal
+  (function() {
+    const blocks = document.querySelectorAll('.mh-reveal');
+    if (!('IntersectionObserver' in window)) {
+      blocks.forEach(el => el.classList.add('visible'));
+      return;
+    }
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    blocks.forEach(el => observer.observe(el));
+  })();
+
+  // Industry slider
+  (function() {
+    const slider = document.getElementById('industrySlider');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+    const dotsContainer = document.getElementById('sliderDots');
+    if (!slider || !prevBtn || !nextBtn || !dotsContainer) return;
+
+    const cards = slider.querySelectorAll('.mh-industry-card');
+    let currentSlide = 0;
+    let autoPlayInterval;
+    const AUTO_PLAY_DELAY = 10000;
+
+    cards.forEach((_, index) => {
+      const dot = document.createElement('button');
+      dot.className = 'mh-slider-dot' + (index === 0 ? ' active' : '');
+      dot.addEventListener('click', () => { goToSlide(index); resetAutoPlay(); });
+      dotsContainer.appendChild(dot);
+    });
+
+    const dots = dotsContainer.querySelectorAll('.mh-slider-dot');
+
+    function updateDots() {
+      dots.forEach((dot, index) => dot.classList.toggle('active', index === currentSlide));
+    }
+
+    function goToSlide(index) {
+      currentSlide = index;
+      const cardWidth = cards[0].offsetWidth;
+      const gap = 20;
+      slider.scrollTo({ left: (cardWidth + gap) * index, behavior: 'smooth' });
+      updateDots();
+    }
+
+    function autoPlay() {
+      currentSlide = (currentSlide + 1) % cards.length;
+      goToSlide(currentSlide);
+    }
+
+    function startAutoPlay() { autoPlayInterval = setInterval(autoPlay, AUTO_PLAY_DELAY); }
+    function resetAutoPlay() { clearInterval(autoPlayInterval); startAutoPlay(); }
+
+    prevBtn.addEventListener('click', () => {
+      currentSlide = Math.max(0, currentSlide - 1);
+      goToSlide(currentSlide);
+      resetAutoPlay();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      currentSlide = Math.min(cards.length - 1, currentSlide + 1);
+      goToSlide(currentSlide);
+      resetAutoPlay();
+    });
+
+    slider.addEventListener('scroll', () => {
+      const cardWidth = cards[0].offsetWidth;
+      const gap = 20;
+      const newSlide = Math.round(slider.scrollLeft / (cardWidth + gap));
+      if (newSlide !== currentSlide) {
+        currentSlide = newSlide;
+        updateDots();
+      }
+    });
+
+    slider.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+    slider.addEventListener('mouseleave', startAutoPlay);
+    startAutoPlay();
+  })();
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+</script>
+<script src="/assets/js/mh-typewriter.js"></script>
+<script>
+  MissionHireTypewriter?.typeInto(document.getElementById('mh-hero-typewriter'), [
+    { text: 'Screen candidates' },
+    { br: true },
+    { text: 'at the speed of ' },
+    { text: 'conviction.', em: true },
+  ], { speed: 42, delay: 600 });
+</script>

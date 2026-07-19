@@ -1,0 +1,536 @@
+<%- include('../../../authpages/includes/header') %>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+<body class="g-sidenav-show bg-gray-100">
+<%- include('../../../authpages/includes/sidebar') %>
+<main class="main-content position-relative mission-chat-layout border-radius-lg">
+  <%- include('../../../authpages/includes/navbar') %>
+
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <div class="right-sidebar mission-schedule-history-panel" id="right-sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-header-title">
+        <i class="bi bi-clock-history" aria-hidden="true"></i>
+        <h4>Schedule History</h4>
+      </div>
+      <button type="button" class="close-sidebar" id="close-sidebar" aria-label="Close history">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <div class="sidebar-content">
+      <ul class="sidebar-list" id="sidebar-list"></ul>
+    </div>
+  </div>
+
+  <style>
+    html, body { overflow-x: hidden; }
+    .mission-schedule-chat.mission-chat-page { overflow: hidden; }
+
+    /* ── Same chat shell as ai-chatInbox.ejs ── */
+    .mission-schedule-chat .chat-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .mission-schedule-chat .input-container.centered {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 80%;
+      max-width: 900px;
+      background: #141c2b;
+      border-radius: 100px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+      padding: 12px;
+      z-index: 30;
+      display: flex;
+      align-items: center;
+      border-top: none !important;
+    }
+
+    .mission-schedule-chat .input-container.centered.rectangle {
+      border-radius: 25px;
+    }
+
+    .mission-schedule-chat .input-container.bottom {
+      position: static;
+      transform: none;
+      width: 100%;
+      padding: 12px 15px;
+      box-shadow: none;
+      border-radius: 0 0 16px 16px;
+      background: var(--mission-bg-card, #1e293b) !important;
+      border-top: 1px solid var(--mission-border, rgba(148, 163, 184, 0.12)) !important;
+    }
+
+    .mission-schedule-chat.mission-chat-page .input-container,
+    .mission-schedule-chat .input-container {
+      transition: all 300ms ease;
+      display: flex;
+      align-items: center !important;
+    }
+
+    .mission-schedule-chat .input-container.hide {
+      display: none !important;
+    }
+
+    .mission-schedule-chat .input-container.centered #user-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      resize: none;
+      height: 48px;
+      min-height: 48px;
+      max-height: 200px;
+    }
+
+    .mission-schedule-chat .input-container.bottom #user-input {
+      flex: 1;
+      padding: 12px 15px;
+      border-radius: 24px;
+      height: auto;
+      min-height: 48px;
+      max-height: 200px;
+    }
+
+    .mission-schedule-chat #user-input {
+      background: #ffffff !important;
+      border: none !important;
+      color: #111 !important;
+      font-size: 16px;
+      outline: none;
+      overflow-y: auto;
+      transition: height 0.15s ease;
+      box-shadow: none !important;
+    }
+
+    .mission-schedule-chat #user-input::placeholder {
+      color: #9aa0a6;
+      font-weight: 500;
+    }
+
+    .mission-schedule-chat #user-input:focus {
+      outline: none;
+      box-shadow: 0 8px 30px rgba(255, 255, 255, 0.08);
+    }
+
+    .mission-schedule-chat #user-input::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mission-schedule-chat .mic-button {
+      padding: 8px;
+      background-color: #fff !important;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      margin-left: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+      border: none !important;
+    }
+
+    .mission-schedule-chat .mic-button i {
+      font-size: 20px;
+      color: #111 !important;
+    }
+
+    .mission-schedule-chat .mic-button.listening {
+      background-color: #dc3545 !important;
+    }
+
+    .mission-schedule-chat .mic-button.listening i {
+      color: #fff !important;
+    }
+
+    .mission-schedule-chat #send-button,
+    .mission-schedule-chat .mic-button {
+      align-self: center;
+      flex-shrink: 0;
+    }
+
+    .mission-schedule-chat #send-button {
+      margin-left: 10px;
+    }
+
+    .mission-schedule-chat .chat-window.is-idle {
+      justify-content: center !important;
+      align-items: center !important;
+      text-align: center;
+      min-height: min(560px, calc(100vh - 220px));
+      position: relative;
+      background:
+        radial-gradient(ellipse 70% 55% at 50% 35%, rgba(212, 162, 78, 0.12), transparent 65%),
+        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(124, 144, 240, 0.1), transparent 60%),
+        radial-gradient(ellipse 40% 35% at 15% 75%, rgba(124, 144, 240, 0.06), transparent 55%),
+        var(--mission-bg-elevated, #14121B) !important;
+    }
+
+    .mission-schedule-chat .mission-toolbar-brand {
+      font-family: 'Fraunces', Georgia, serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #F3EFE7;
+      letter-spacing: 0.01em;
+    }
+
+    .mission-schedule-chat .mission-start-hero {
+      width: min(820px, 94vw);
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 1.5rem 2rem;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+      animation: missionHeroIn 0.7s ease both;
+    }
+
+    @keyframes missionHeroIn {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mission-schedule-chat .mission-hero-glow {
+      position: absolute;
+      top: 18%;
+      left: 50%;
+      width: 280px;
+      height: 280px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212, 162, 78, 0.22), transparent 70%);
+      filter: blur(28px);
+      pointer-events: none;
+      z-index: -1;
+      animation: missionGlowPulse 4s ease-in-out infinite;
+    }
+
+    @keyframes missionGlowPulse {
+      0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+    }
+
+    .mission-schedule-chat .mission-hero-eyebrow {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #D4A24E;
+      margin: 0 0 1.25rem;
+    }
+
+    .mission-schedule-chat .mission-hero-mark {
+      width: 92px;
+      height: 92px;
+      margin: 0 auto 1.5rem;
+      border-radius: 26px;
+      background: linear-gradient(145deg, #D4A24E 0%, #8C6E38 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.12) inset,
+        0 12px 40px rgba(212, 162, 78, 0.4),
+        0 0 60px rgba(212, 162, 78, 0.18);
+      position: relative;
+      animation: missionMarkFloat 5s ease-in-out infinite;
+    }
+
+    @keyframes missionMarkFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .mission-schedule-chat .mission-hero-mark::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 30px;
+      background: linear-gradient(145deg, rgba(212, 162, 78, 0.45), rgba(124, 144, 240, 0.15));
+      z-index: -1;
+      filter: blur(8px);
+    }
+
+    .mission-schedule-chat .mission-hero-mark i,
+    .mission-schedule-chat .mission-hero-mark .mission-hero-icon {
+      font-size: 2.75rem;
+      color: #241B08;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+      flex-shrink: 0;
+    }
+
+    .mission-schedule-chat .mission-hero-mark i {
+      font-family: "bootstrap-icons" !important;
+      -webkit-text-fill-color: #241B08 !important;
+      background: none !important;
+      -webkit-background-clip: border-box !important;
+    }
+
+    .mission-schedule-chat .mission-hero-mark .mission-hero-icon {
+      width: 2.6rem;
+      height: 2.6rem;
+      display: block;
+    }
+
+    .mission-schedule-chat .mission-start-hero #intro-text {
+      width: 100%;
+      text-align: center;
+      font-family: 'Fraunces', Georgia, serif !important;
+      font-size: clamp(1.65rem, 3.4vw, 2.35rem) !important;
+      font-weight: 500;
+      line-height: 1.28;
+      letter-spacing: -0.02em;
+      margin: 0 auto 0.85rem;
+      background: none !important;
+      -webkit-background-clip: border-box !important;
+      background-clip: border-box !important;
+      -webkit-text-fill-color: #F3EFE7 !important;
+      color: #F3EFE7 !important;
+      filter: none;
+    }
+
+    .mission-schedule-chat .mission-start-hero #intro-text .mission-hero-sub {
+      display: block;
+      margin-top: 0.35rem;
+      font-family: 'Inter', system-ui, sans-serif !important;
+      font-size: clamp(0.95rem, 1.8vw, 1.15rem) !important;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: #A69FB3 !important;
+      -webkit-text-fill-color: #A69FB3 !important;
+    }
+
+    .mission-schedule-chat .mission-hero-lead {
+      max-width: 420px;
+      margin: 0 auto 1.75rem;
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 0.95rem;
+      line-height: 1.55;
+      color: #736C82;
+      font-weight: 400;
+    }
+
+    .mission-schedule-chat .mission-start-hero .button-container {
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    }
+
+    .mission-schedule-chat .mission-start-hero .button-container button {
+      margin: 0 auto !important;
+      display: inline-flex !important;
+      align-items: center;
+      justify-content: center;
+      gap: 0.55rem;
+      font-size: 1.05rem !important;
+      padding: 0.9rem 2.35rem !important;
+      border-radius: 12px !important;
+      min-width: 240px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .mission-schedule-chat .mission-start-hero .button-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(212, 162, 78, 0.5) !important;
+    }
+
+    .mission-schedule-chat .bot-message-centered {
+      align-self: center;
+      text-align: center;
+      max-width: 70%;
+      margin: 120px auto 24px;
+      font-size: 1.35rem;
+      color: #94a3b8 !important;
+      background: transparent !important;
+      border: none !important;
+      padding: 8px 12px;
+      line-height: 1.4;
+    }
+
+    /* flex-start so overflow scroll reaches older messages at top */
+    .mission-schedule-chat .chat-window.chat-active {
+      justify-content: flex-start !important;
+      align-items: stretch;
+      padding: 16px 20px 16px;
+      overflow-y: auto !important;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      flex: 1 1 auto;
+      min-height: 0;
+      max-height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    .mission-schedule-chat .chat-wrapper {
+      overflow: hidden;
+      max-height: calc(100vh - 200px);
+    }
+
+    .mission-schedule-chat .message {
+      max-width: 78%;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .mission-schedule-chat .msg-sender-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      opacity: 0.95;
+    }
+
+    .mission-schedule-chat .message.bot-message {
+      align-self: flex-start;
+      background: #1e293b !important;
+      color: #e2e8f0 !important;
+      border: 1px solid rgba(34, 211, 238, 0.35) !important;
+      border-left: 3px solid #22d3ee !important;
+      border-radius: 12px 12px 12px 4px !important;
+    }
+
+    .mission-schedule-chat .message.bot-message .msg-sender-label {
+      color: #22d3ee;
+    }
+
+    .mission-schedule-chat .message.user-message {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+      color: #fff !important;
+      border: none !important;
+      border-right: 3px solid #93c5fd !important;
+      border-radius: 12px 12px 4px 12px !important;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .mission-schedule-chat .message.user-message .msg-sender-label {
+      color: rgba(255, 255, 255, 0.92);
+      text-align: right;
+    }
+
+    .mission-schedule-chat .message.bot-message.success-msg {
+      background: rgba(34, 197, 94, 0.15) !important;
+      border-color: rgba(34, 197, 94, 0.4) !important;
+      border-left-color: #22c55e !important;
+      color: #bbf7d0 !important;
+    }
+
+    .mission-schedule-chat .message.bot-message.error-msg {
+      background: rgba(239, 68, 68, 0.12) !important;
+      border-color: rgba(239, 68, 68, 0.4) !important;
+      border-left-color: #f87171 !important;
+      color: #fecaca !important;
+    }
+
+    .mission-schedule-chat .message.bot-message-review {
+      max-width: 88%;
+      background: #0f172a !important;
+      border-left: 3px solid #a78bfa !important;
+    }
+
+    .mission-schedule-chat .message.bold-message {
+      align-self: flex-start;
+      background: #334155 !important;
+      color: #94a3b8 !important;
+      font-style: italic;
+      padding: 8px 14px;
+      max-width: 40%;
+    }
+
+    .mission-schedule-chat .chat-widget.message {
+      align-self: flex-start;
+      border-left: 3px solid #f59e0b !important;
+    }
+
+    .mission-schedule-chat .chat-widget .msg-sender-label {
+      color: #fbbf24;
+    }
+
+    .mission-schedule-chat .chat-widget .form-control::placeholder,
+    .mission-schedule-chat .chat-widget textarea::placeholder {
+      color: #94a3b8 !important;
+      opacity: 1 !important;
+    }
+
+    .mission-schedule-chat .message.user-message-questions {
+      white-space: pre-wrap;
+      line-height: 1.55;
+    }
+  </style>
+
+  <div class="container-fluid mission-chat-page mission-schedule-chat">
+    <div class="mission-chat-toolbar d-flex flex-wrap align-items-center justify-content-between gap-2">
+      <span class="mission-toolbar-brand">Mission Hire — Recruitment Assistant</span>
+      <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+        <% if (permissions?.['read:any_dropdown']) { %>
+          <select name="company_id" id="change_account" class="form-select form-select-sm account-select" required>
+            <option value="">Select an Account</option>
+            <% companies.forEach(function(company) { %>
+              <option value="<%= company.id %>" <%= Number(selectedCompanyId) === Number(company.id) ? 'selected' : '' %>>
+                <%= company.name %>
+              </option>
+            <% }) %>
+          </select>
+        <% } %>
+        <button type="button" class="mission-toolbar-reset" id="btn-reset-chat" title="Start over">Reset</button>
+        <button type="button" class="mission-history-btn" id="sidebar-toggle-btn" title="Schedule history">
+          <i class="bi bi-clock-history"></i> History
+        </button>
+      </div>
+    </div>
+
+    <div class="chat-wrapper">
+      <div class="chat-window is-idle" id="chat-window">
+        <div id="default-message" class="default-message mission-start-hero">
+          <div class="mission-hero-glow" aria-hidden="true"></div>
+          <p class="mission-hero-eyebrow">Video interview AI</p>
+          <div class="mission-hero-mark" aria-hidden="true">
+            <svg class="mission-hero-icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h11A2.5 2.5 0 0 1 20 5.5v7A2.5 2.5 0 0 1 17.5 15H10l-4.2 3.15a.75.75 0 0 1-1.15-.64V15H6.5A2.5 2.5 0 0 1 4 12.5v-7Z" fill="#241B08"/>
+              <path d="M8 8.25h8M8 11.25h5.5" stroke="#D4A24E" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div id="intro-text">Hello! I'm Mission Hire.<br><span class="mission-hero-sub">Your Virtual AI Assistant</span></div>
+          <p class="mission-hero-lead">Schedule interviews, brief candidates, and move hiring forward — in one conversation.</p>
+          <div class="button-container">
+            <button type="button" id="btn-start-chat">
+              <i class="bi bi-chat-dots-fill"></i> Talk to Mission Hire
+            </button>
+          </div>
+        </div>
+        <div id="chat-anchor" aria-hidden="true"></div>
+      </div>
+
+      <div class="input-container hide centered" id="input-section">
+        <textarea id="user-input" rows="2"
+          placeholder="Enter job profile, description, or candidate info..."
+          autocomplete="off"></textarea>
+        <button type="button" id="send-button" class="hide" title="Send">Send</button>
+        <div class="mic-button" id="mic-button" title="Click to speak">
+          <i class="bi bi-mic"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('../../../authpages/includes/footer') %>
+</main>
+<script src="/modules/candidate-interview/js/schedule-chat.js?v=17"></script>
+</body>

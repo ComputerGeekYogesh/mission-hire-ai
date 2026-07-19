@@ -1,0 +1,233 @@
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> -->
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<aside
+  class="sidenav navbar-vertical navbar-expand-xs border-radius-xl fixed-start ms-2 my-2 mission-sidebar"
+  id="sidenav-main"
+>
+  <div class="mission-sidebar-brand">
+    <div class="mission-brand-mark" aria-label="Mission Hire">
+      <span class="mission-brand-mission">MISSION</span>
+      <span class="mission-brand-hire">HIRE</span>
+    </div>
+    <div class="mission-logo-text">AI ASSISTANT</div>
+  </div>
+
+  <hr class="horizontal dark mt-0 mb-0" />
+
+  <div class="collapse sidebar navbar-collapse w-auto" id="sidenav-collapse-main">
+    <ul class="navbar-nav">
+
+      <% //----------------- SUPER ADMIN SECTION --------------------%>
+      <% const hasSuperAdminPermissions =
+        permissions?.['read:any_superadmin_dashboard'] ||
+        permissions?.['read:any_companies']; %>
+
+      <% const isSuperAdminActive =
+        ['/admin/super_admin_dashboard', '/admin/companies','/admin/permission'].includes(currentPath); %>
+
+      <% if (hasSuperAdminPermissions) { %>
+<li class="nav-item">
+  <button
+    type="button"
+    class="nav-link navbar-toggler text-white text-sm w-100 text-start collapsed"
+    data-bs-toggle="collapse"
+    data-bs-target="#superAdminMenu"
+    aria-expanded="<%= isSuperAdminActive ? 'true' : 'false' %>"
+    aria-controls="superAdminMenu"
+  >
+    <i class="material-symbols-rounded opacity-5">admin_panel_settings</i>
+    <span class="nav-link-text ms-1">Super Admin</span>
+  </button>
+
+  <div class="collapse <%= isSuperAdminActive ? 'show' : '' %>" id="superAdminMenu">
+    <ul class="nav ms-4">
+      <% if (permissions?.['read:any_superadmin_dashboard']) { %>
+      <li class="nav-item">
+        <a
+          class="nav-link text-xs <%= currentPath === '/admin/super_admin_dashboard' ? 'active bg-gradient-info text-white' : 'text-white' %>"
+          href="/admin/super_admin_dashboard"
+        >
+          <i class="bi bi-grid me-2"></i>
+          <span class="nav-link-text ms-1">Dashboard</span>
+        </a>
+      </li>
+      <% } %>
+
+      <% if (permissions?.['read:any_companies']) { %>
+      <li class="nav-item">
+        <a
+          class="nav-link text-xs <%= currentPath === '/admin/companies' ? 'active bg-gradient-info text-white' : 'text-white' %>"
+          href="/admin/companies"
+        >
+          <i class="bi bi-building me-2"></i>
+          <span class="nav-link-text ms-1">Accounts List</span>
+        </a>
+      </li>
+      <% } %>
+
+      <li class="nav-item">
+        <a
+          class="nav-link text-sm <%= currentPath === '/admin/permission' ? 'active text-white' : 'text-white' %>"
+          href="/admin/permission"
+        >
+          <i class="bi bi-shield-lock me-2"></i>
+          <span class="nav-link-text ms-1">Permission List</span>
+        </a>
+      </li>
+
+    </ul>
+  </div>
+</li>
+<% } %>
+
+      <% //----------------- ACCOUNT SECTION --------------------%>
+      <% const hasAdminPermissions =
+        permissions?.['read:any_company_dashboard'] ||
+        permissions?.['read:any_user']; %>
+
+      <% const isAdminActive =
+        ['/admin/dashboard', '/admin','/admin/roles'].includes(currentPath); %>
+
+      <% if (hasAdminPermissions) { %>
+      <li class="nav-item">
+        <button
+          type="button"
+          class="nav-link text-white text-sm w-100 text-start <%= isAdminActive ? '' : 'collapsed' %>"
+          data-bs-toggle="collapse"
+          data-bs-target="#adminMenu"
+          aria-expanded="<%= isAdminActive %>"
+        >
+          <i class="bi bi-people me-2"></i>
+          <span class="nav-link-text ms-1">Accounts</span>
+        </button>
+
+        <div class="collapse <%= isAdminActive ? 'show' : '' %>" id="adminMenu">
+          <ul class="nav ms-4">
+           <% if (permissions?.['read:any_company_dashboard']) { %>
+            <li class="nav-item">
+              <a
+                class="nav-link text-xs <%= currentPath === '/admin/dashboard' ? 'active bg-gradient-info text-white' : 'text-white' %>"
+                href="/admin/dashboard"
+              >
+                <i class="bi bi-grid me-2"></i>
+                <span class="nav-link-text ms-1">Dashboard</span>
+              </a>
+            </li>
+          <% } %>
+
+            <% if (permissions?.['read:any_user']) { %>
+            <li class="nav-item">
+              <a
+                class="nav-link text-xs <%= currentPath === '/admin' ? 'active bg-gradient-info text-white' : 'text-white' %>"
+                href="/admin"
+              >
+                <i class="bi bi-people me-2"></i>
+                <span class="nav-link-text ms-1">Users</span>
+              </a>
+            </li>
+            <% } %>
+
+            <% if (permissions?.['read:any_roles']) { %>
+              <li class="nav-item">
+                <a
+                  class="nav-link text-sm <%= currentPath === '/admin/roles' ? 'active text-white' : 'text-white' %>"
+                  href="/admin/roles"
+                >
+                  <i class="bi bi-person-gear me-2"></i>
+                  <span class="nav-link-text ms-1">Roles</span>
+                </a>
+              </li>
+              <% } %>
+
+          </ul>
+        </div>
+      </li>
+      <% } %>
+
+      <% if (permissions?.['read:any_ai_chat_box']) { %>
+      <li class="nav-item">
+        <a
+          class="nav-link text-sm <%= currentPath === '/admin/interviews/schedule' ? 'active text-white' : 'text-white' %>"
+          href="/admin/interviews/schedule"
+        >
+          <i class="bi bi-chat-left-text me-2"></i>
+          <span class="nav-link-text ms-1">Mission Hire</span>
+        </a>
+      </li>
+      <% } %>
+
+      <% const showInterviewNav = roleId === 1; %>
+
+      <% if (showInterviewNav) { %>
+      <% const isInterviewMgmtActive =
+        (currentPath || '').startsWith('/admin/interviews') &&
+        currentPath !== '/admin/interviews/schedule'; %>
+      <li class="nav-item">
+        <button
+          type="button"
+          class="nav-link text-white text-sm w-100 text-start <%= isInterviewMgmtActive ? '' : 'collapsed' %>"
+          data-bs-toggle="collapse"
+          data-bs-target="#interviewMgmtMenu"
+          aria-expanded="<%= isInterviewMgmtActive %>"
+        >
+          <i class="bi bi-camera-video me-2"></i>
+          <span class="nav-link-text ms-1">Interview Management</span>
+        </button>
+        <div class="collapse <%= isInterviewMgmtActive ? 'show' : '' %>" id="interviewMgmtMenu">
+          <ul class="nav ms-4">
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/dashboard' || currentPath === '/admin/interviews' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/dashboard">
+                <i class="bi bi-grid me-2"></i><span class="nav-link-text ms-1">Interview Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/scheduled' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/scheduled">
+                <i class="bi bi-calendar-event me-2"></i><span class="nav-link-text ms-1">Scheduled Interviews</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/active' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/active">
+                <i class="bi bi-broadcast me-2"></i><span class="nav-link-text ms-1">Active Interviews</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/recordings' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/recordings">
+                <i class="bi bi-film me-2"></i><span class="nav-link-text ms-1">Recordings</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/verification-logs' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/verification-logs">
+                <i class="bi bi-shield-check me-2"></i><span class="nav-link-text ms-1">Verification Logs</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/flags' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/flags">
+                <i class="bi bi-exclamation-triangle me-2"></i><span class="nav-link-text ms-1">Suspicious Activity</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/telemetry' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/telemetry">
+                <i class="bi bi-activity me-2"></i><span class="nav-link-text ms-1">Telemetry Reports</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-xs <%= currentPath === '/admin/interviews/analytics' ? 'active bg-gradient-info text-white' : 'text-white' %>" href="/admin/interviews/analytics">
+                <i class="bi bi-bar-chart me-2"></i><span class="nav-link-text ms-1">Interview Analytics</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </li>
+      <% } %>
+
+    </ul>
+  </div>
+
+</aside>
+
+
+
+<!-- Bootstrap JS Bundle -->

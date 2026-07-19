@@ -1,0 +1,52 @@
+<% 
+  const pgFilters = typeof filters !== 'undefined' ? filters : {};
+  function pageHref(p) {
+    const parts = [];
+    for (const key of Object.keys(pgFilters)) {
+      const val = pgFilters[key];
+      if (val !== undefined && val !== null && String(val) !== '') {
+        parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(String(val)));
+      }
+    }
+    parts.push('page=' + encodeURIComponent(String(p)));
+    return '?' + parts.join('&');
+  }
+%>
+<% if (typeof totalPages !== 'undefined' && totalPages > 1) { %>
+<nav aria-label="Page navigation" class="mt-4 mission-list-pagination">
+  <ul class="pagination pagination-sm justify-content-center flex-wrap mb-0 gap-1">
+    <li class="page-item <%= currentPage <= 1 ? 'disabled' : '' %>">
+      <a class="page-link mission-page-nav-btn" href="<%= currentPage <= 1 ? '#' : pageHref(Math.max(1, currentPage - 1)) %>" aria-label="Previous page">
+        <i class="bi bi-chevron-left" aria-hidden="true"></i>
+        <span class="d-none d-sm-inline ms-1">Previous</span>
+      </a>
+    </li>
+    <% if (pageRange && pageRange.showFirst) { %>
+      <li class="page-item"><a class="page-link" href="<%= pageHref(1) %>">1</a></li>
+      <% if (pageRange.showFirstEllipsis) { %>
+        <li class="page-item disabled" aria-hidden="true"><span class="page-link mission-page-ellipsis">…</span></li>
+      <% } %>
+    <% } %>
+    <% (pageRange && pageRange.pages ? pageRange.pages : []).forEach(function (i) { %>
+      <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+        <a class="page-link" href="<%= pageHref(i) %>"><%= i %></a>
+      </li>
+    <% }) %>
+    <% if (pageRange && pageRange.showLast) { %>
+      <% if (pageRange.showLastEllipsis) { %>
+        <li class="page-item disabled" aria-hidden="true"><span class="page-link mission-page-ellipsis">…</span></li>
+      <% } %>
+      <li class="page-item"><a class="page-link" href="<%= pageHref(totalPages) %>"><%= totalPages %></a></li>
+    <% } %>
+    <li class="page-item <%= currentPage >= totalPages ? 'disabled' : '' %>">
+      <a class="page-link mission-page-nav-btn" href="<%= currentPage >= totalPages ? '#' : pageHref(Math.min(totalPages, currentPage + 1)) %>" aria-label="Next page">
+        <span class="d-none d-sm-inline me-1">Next</span>
+        <i class="bi bi-chevron-right" aria-hidden="true"></i>
+      </a>
+    </li>
+  </ul>
+  <p class="text-center text-muted text-sm mt-2 mb-0">
+    Page <strong><%= currentPage %></strong> of <strong><%= totalPages %></strong><% if (typeof total !== 'undefined') { %> · <%= total %> records<% } %>
+  </p>
+</nav>
+<% } %>

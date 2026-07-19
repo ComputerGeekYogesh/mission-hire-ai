@@ -1,0 +1,267 @@
+<%- include('includes/header') %>
+<main class="main-content mt-0">
+  <div class="page-header align-items-start min-vh-100 position-relative">
+    <canvas id="nodes-bg"></canvas>
+    <span class="mask bg-gradient-dark opacity-6"></span>
+
+    <div class="container my-auto">
+      <div class="row">
+        <!-- Left Side Typing / Content -->
+        <div class="col-lg-6 col-md-12 col-12 d-flex justify-content-start align-items-center">
+          <div class="text-white text-lg-start typing-container">
+            <h1 class="display-3 font-weight-bolder" id="typing-text"></h1>
+          </div>
+        </div>
+
+        <!-- Right Side OTP Panel -->
+        <div class="col-lg-4 col-md-8 col-12 ms-auto">
+          <div class="card z-index-2 fadeIn3 fadeInBottom login-card">
+            <div class="p-0 position-relative mx-3 z-index-2" style="margin-top: 1.5rem !important;">
+              <div class="login-header py-3 px-3">
+                <h4 class="text-white font-weight-bolder text-center mt-2 mb-0">Verify Email</h4>
+                <p class="mb-1 mt-1 text-center text-white">
+                  Enter the OTP sent to <strong><%= email %></strong>
+                </p>
+              </div>
+            </div>
+            <div class="card-body">
+              <form role="form" class="text-start" action="/verify-code" method="POST" >
+                <input type="hidden" name="token" value="<%= token %>" />
+                <div class="input-group input-group-outline my-3">
+                  <input type="text" name="code" class="form-control" required />
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn login-btn w-100 my-4 mb-2">Verify</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="col-lg-12 col-md-8 col-12 mx-auto mt-3">
+            <% if(success_msg && success_msg.length > 0) { %>
+              <div class="alert alert-success text-white"><%= success_msg %></div>
+            <% } %>
+            <% if(error_msg && error_msg.length > 0) { %>
+              <div class="alert alert-danger text-white"><%= error_msg %></div>
+            <% } %>
+            <% if(error && error.length > 0) { %>
+              <div class="alert alert-danger text-white"><%= error %></div>
+            <% } %>
+          </div>
+          
+        </div>
+
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('includes/footer') %>
+
+<style>
+  body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #0d0d0d;
+  }
+
+  .back-login {
+    color: #00e5ff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    text-decoration: none; /* no underline */
+  }
+
+  .back-login:hover {
+    color: #00b0ff;
+    text-shadow: 0 0 8px #00e5ff;
+  }
+
+  /* Card styling (same as login page) */
+  .login-card {
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(0, 229, 255, 0.3);
+    border-radius: 16px;
+    box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .login-header {
+    background: linear-gradient(90deg, rgba(0,229,255,0.2), rgba(0,229,255,0.05));
+    border-bottom: 1px solid rgba(0,229,255,0.3);
+    border-radius: 16px 16px 0 0;
+  }
+
+  .login-card .form-control {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 229, 255, 0.2);
+    color: white;
+    border-radius: 10px;
+  }
+
+  .login-card .form-control:focus {
+    background: rgba(0, 229, 255, 0.05);
+    border: 1px solid #00e5ff;
+    box-shadow: 0 0 10px #00e5ff;
+    color: white;
+  }
+
+  .login-btn {
+    background: linear-gradient(90deg, #00e5ff, #00b0ff);
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+  }
+
+  .login-btn:hover {
+    box-shadow: 0 0 20px #00e5ff;
+    transform: translateY(-2px);
+  }
+
+  .alert {
+    background: rgba(0,0,0,0.7);
+    border: 1px solid #00e5ff;
+    color: white;
+    text-align: center;
+    font-weight: 500;
+  }
+
+  /* Typing text */
+  .typing-container h1 {
+    font-size: 2.5rem;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #10c4d5;
+    border-right: 0.15em solid transparent;
+    text-align: left;
+    white-space: normal;
+    display: inline-block;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+
+  .typing-container h1.blinking-cursor {
+    border-right: 0.15em solid white;
+    animation: blink-caret 0.75s step-end infinite;
+  }
+
+  @keyframes blink-caret {
+    from, to { border-color: transparent; }
+    50% { border-color: white; }
+  }
+
+  @media (max-width: 768px) {
+    .typing-container h1 {
+      font-size: 2rem;
+    }
+  }
+
+  #nodes-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    background: #0d0d0d;
+  }
+</style>
+
+<script>
+  // Particle background (same as login page)
+  const canvas = document.getElementById("nodes-bg");
+  const ctx = canvas.getContext("2d");
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  let particles = [];
+  const numParticles = 100;
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.radius = 3.5;
+      this.vx = (Math.random() - 0.5) * 2;
+      this.vy = (Math.random() - 0.5) * 2;
+    }
+    update() {
+      this.x += this.vx;
+      this.y += this.vy;
+      if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+      if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "#00e5ff"; 
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "#00e5ff";
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
+
+  function connectParticles() {
+    for (let a = 0; a < particles.length; a++) {
+      for (let b = a; b < particles.length; b++) {
+        let dx = particles[a].x - particles[b].x;
+        let dy = particles[a].y - particles[b].y;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 150) {
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(0,229,255,0.3)";
+          ctx.lineWidth = 1.2;
+          ctx.moveTo(particles[a].x, particles[a].y);
+          ctx.lineTo(particles[b].x, particles[b].y);
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    connectParticles();
+    requestAnimationFrame(animate);
+  }
+
+  for (let i = 0; i < numParticles; i++) particles.push(new Particle());
+  animate();
+
+  window.addEventListener("mousemove", e => {
+    particles.push(new Particle());
+    if (particles.length > numParticles) particles.shift();
+  });
+
+  window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  // Typing animation for left content
+  const textElement = document.getElementById("typing-text");
+  const fullText = "Almost there! Enter the OTP sent to email to verify your account and continue";
+  let charIndex = 0;
+  const typingSpeed = 100;
+
+  function typeWriter() {
+    if (charIndex < fullText.length) {
+      textElement.textContent += fullText.charAt(charIndex);
+      charIndex++;
+      setTimeout(typeWriter, typingSpeed);
+    } else {
+      textElement.classList.remove('blinking-cursor');
+    }
+  }
+
+  textElement.classList.add('blinking-cursor');
+  setTimeout(typeWriter, 1000);
+</script>
